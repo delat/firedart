@@ -1,79 +1,135 @@
+import 'dart:core';
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:firedart/io/access_exporter.dart';
-import 'package:gcloud/storage.dart';
-import 'package:googleapis_auth/auth_io.dart' as gauth;
+import 'package:firedart/firebase_storage/firebase_metadata.dart';
+import 'package:firedart/auth/firebase_auth.dart';
 
-import '../auth/firebase_auth.dart';
+class FirebaseStorageOptions {
+  FirebaseStorageOptions();
+}
 
 class FirebaseStorage {
-  final Bucket _bucket;
+  final String storageBucket;
+  final FirebaseStorageOptions options;
+  final FirebaseAuth auth;
 
-  FirebaseStorage._internal(this._bucket);
+  FirebaseStorage(this.storageBucket, this.auth, {this.options});
 
-  static Future<FirebaseStorage> getBucket(
-      String projectId, String bucketId, FirebaseAuth auth) async {
-    assert(projectId.isNotEmpty, 'Project ID cannot be null');
-    assert(bucketId.isNotEmpty, 'Bucket ID cannot be null');
-    assert(auth != null, 'Auth cannot be null');
+  FirebaseStorageReference child(String childRoot) {
+    return FirebaseStorageReference(this, childRoot);
+  }
+}
 
-    var credentials = gauth.ServiceAccountCredentials.fromJson(
-        auth.serviceAccount.serviceAccountString);
-    var client = await gauth.clientViaServiceAccount(
-        credentials, Storage.SCOPES,
-        baseClient: auth.httpClient);
-    var storage = Storage(client, projectId);
-    var bucket = await storage.bucket(bucketId);
+class FirebaseStorageReference {
+  static final String _firebaseStorageEndpoint =
+      'https://firebasestorage.googleapis.com/v0/b/';
 
-    return FirebaseStorage._internal(bucket);
+  final FirebaseStorage storage;
+  List<String> children;
+
+  FirebaseStorageReference(this.storage, String childRoot) {
+    children = [];
+    children.add(childRoot);
   }
 
-  Future<void> download(String remotePath, String localPath,
-      {int offset, int length}) async {
-    var sink = getIOAccess().openWrite(localPath);
-    await _bucket.read(remotePath, offset: offset, length: length).pipe(sink);
-    await sink.close();
+  FirebaseStorageReference child(String name) {
+    children.add(name);
+    return this;
   }
 
-  Future<ObjectInfo> upload(String remotePath, String localPath,
-      {int length,
-      ObjectMetadata metadata,
-      Acl acl,
-      PredefinedAcl predefinedAcl,
-      String contentType}) async {
-    var streamSink = _bucket.write(remotePath,
-        length: length,
-        metadata: metadata,
-        acl: acl,
-        predefinedAcl: predefinedAcl,
-        contentType: contentType);
+  Future<void> upload(Uint8List data,
+      {void Function(int value) onProgress}) async {
+    var url = _getTargetUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var result = await http.post(url,
+          headers: {'Authorization': 'Firebase $token'}, body: data);
 
-    await getIOAccess().openRead(localPath).pipe(streamSink);
-
-    return await streamSink.done;
+      if (result.statusCode != 200) {
+        throw Exception('Server responded with error: ${result.statusCode}');
+      }
+    } catch (ex) {
+      throw Exception([url, ex]);
+    }
   }
 
-  Future<ObjectInfo> uploadBytes(String remotePath, Uint8List bytes,
-          {ObjectMetadata metadata,
-          Acl acl,
-          PredefinedAcl predefinedAcl,
-          String contentType}) =>
-      _bucket.writeBytes(remotePath, bytes,
-          metadata: metadata,
-          acl: acl,
-          predefinedAcl: predefinedAcl,
-          contentType: contentType);
+  Future<Uint8List> download() async {
+    var downloadUrl = await getDownloadUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var file = await http.readBytes(downloadUrl,
+          headers: {'Authorization': 'Firebase $token'});
+      return file;
+    } catch (ex) {
+      throw Exception([downloadUrl, ex]);
+    }
+  }
 
-  Future<ObjectInfo> info(String remotePath) => _bucket.info(remotePath);
+  Future<String> getDownloadUrl() async {
+    var data = await _performFetch();
+    if (data['downloadTokens'] == null) {
+      throw Exception(
+          'Could not extract "downloadTokens" property from response. Response: $data');
+    }
 
-  Future delete(String remotePath) => _bucket.delete(remotePath);
+    return _getFullDownloadUrl() + data['downloadTokens'];
+  }
 
-  Future updateMetadata(String remotePath, ObjectMetadata metadata) =>
-      _bucket.updateMetadata(remotePath, metadata);
+  Future<FirebaseMetaData> getMetaData() async {
+    var data = await _performFetch();
+    return FirebaseMetaData.fromMap(data);
+  }
 
-  Stream<BucketEntry> list({String prefix}) => _bucket.list(prefix: prefix);
+  Future<void> delete() async {
+    var url = _getDownloadUrl();
+    var resultContent = 'N/A';
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var result =
+          await http.delete(url, headers: {'Authorization': 'Firebase $token'});
+      resultContent = result.body;
 
-  Future<Page<BucketEntry>> page({String prefix, int pageSize = 50}) async =>
-      (await _bucket.page(prefix: prefix, pageSize: pageSize));
+      if (result.statusCode != 200) {
+        throw Exception('Server responded with error: ${result.statusCode}');
+      }
+    } catch (ex) {
+      throw Exception([url, resultContent, ex]);
+    }
+  }
+
+  String _getTargetUrl() {
+    return '${_firebaseStorageEndpoint}${storage.storageBucket}/o?name=${_getEscapedPath()}';
+  }
+
+  String _getDownloadUrl() {
+    return '${_firebaseStorageEndpoint}${storage.storageBucket}/o/${_getEscapedPath()}';
+  }
+
+  String _getFullDownloadUrl() {
+    return _getDownloadUrl() + '?alt=media&token=';
+  }
+
+  String _getEscapedPath() {
+    return Uri.encodeComponent(children.join('/'));
+  }
+
+  Future<Map<String, dynamic>> _performFetch() async {
+    var url = _getDownloadUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var result =
+          await http.read(url, headers: {'Authorization': 'Firebase $token'});
+
+      return jsonDecode(result);
+    } catch (ex) {
+      throw Exception([url, ex]);
+    }
+  }
 }
