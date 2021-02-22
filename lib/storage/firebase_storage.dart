@@ -2,6 +2,7 @@ import 'dart:core';
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:firedart/storage/firebase_metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
@@ -65,6 +66,24 @@ class FirebaseStorageReference {
       var file = await http.readBytes(downloadUrl,
           headers: {'Authorization': 'Firebase $token'});
       return file;
+    } catch (ex) {
+      throw Exception([downloadUrl, ex]);
+    }
+  }
+
+  Future<void> writeToFile(File file) async {
+    var downloadUrl = await getDownloadUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var data = await http.readBytes(downloadUrl,
+          headers: {'Authorization': 'Firebase $token'});
+
+      if (file.existsSync() == false) {
+        await file.create();
+      }
+
+      await file.writeAsBytes(data);
     } catch (ex) {
       throw Exception([downloadUrl, ex]);
     }
