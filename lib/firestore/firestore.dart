@@ -5,8 +5,8 @@ import 'package:firedart/auth/firebase_auth.dart';
 import 'firestore_gateway.dart';
 import 'models.dart';
 
-class FieldValue {
-  Object serverTimestamp() => {'sv': 'timestamp'};
+abstract class FieldValue {
+  static Object serverTimestamp() => {'sv': 'timestamp'};
 }
 
 class Firestore {
