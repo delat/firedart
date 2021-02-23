@@ -120,20 +120,20 @@ class FullMetadata {
 
   /// The size of this object, in bytes.
   int get size {
-    return _metadata['size'];
+    return int.tryParse(_metadata['size']);
   }
 
   /// A DateTime representing when this object was created.
   DateTime get timeCreated {
-    return _metadata['creationTimeMillis'] == null
+    return _metadata['timeCreated'] == null
         ? null
-        : DateTime.fromMillisecondsSinceEpoch(_metadata['creationTimeMillis']);
+        : DateTime.tryParse(_metadata['timeCreated']);
   }
 
   /// A DateTime representing when this object was updated.
   DateTime get updated {
-    return _metadata['updatedTimeMillis'] == null
+    return _metadata['updated'] == null
         ? null
-        : DateTime.fromMillisecondsSinceEpoch(_metadata['updatedTimeMillis']);
+        : DateTime.tryParse(_metadata['updated']);
   }
 }
