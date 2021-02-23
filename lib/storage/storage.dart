@@ -231,10 +231,9 @@ class FirebaseStorageReference {
     }
 
     String reqUrl;
-    var sb = storage.storageBucket.replaceFirst('.appspot.com', '');
     var first = true;
 
-    reqUrl = '{${_firebaseStorageEndpoint}{$sb}/o/?';
+    reqUrl = '${_firebaseStorageEndpoint}${storage.storageBucket}/o/?';
 
     if (child != null) {
       reqUrl += 'prefix=${child._getEscapedPath()}${Uri.encodeComponent("/")}';
