@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firedart/firedart.dart';
-import 'package:gcloud/storage.dart';
 import 'package:test/test.dart';
 
 import 'test_config.dart';
@@ -10,11 +9,11 @@ Future main() async {
   var bucket;
   FirebaseAuth auth;
   await setUp(() async {
-    var tokenStore = VolatileStore();
-    auth = FirebaseAuth(apiKey, tokenStore,
-        serviceAccount: ServiceAccount.fromEnvironmentVariable());
+    // var tokenStore = VolatileStore();
+    // auth = FirebaseAuth(apiKey, tokenStore,
+    //     serviceAccount: ServiceAccount.fromEnvironmentVariable());
 
-    bucket = await FirebaseStorage.getBucket(projectId, storageUrl, auth);
+    // bucket = await FirebaseStorage.getBucket(projectId, storageUrl, auth);
   });
 
   await test('Storage download', () async {
@@ -29,14 +28,14 @@ Future main() async {
   });
 
   await test('Storage upload', () async {
-    var file = File('localDirectory/localFile.jpg');
-    await bucket.upload('remoteDirectory/remoteFile.jpg', file.absolute.path,
-        predefinedAcl: PredefinedAcl.publicRead);
+    // var file = File('localDirectory/localFile.jpg');
+    // await bucket.upload('remoteDirectory/remoteFile.jpg', file.absolute.path,
+    //     predefinedAcl: PredefinedAcl.publicRead);
 
-    var info = await bucket.info('remoteDirectory/remoteFile.jpg');
-    expect(info.downloadLink != null, true);
+    // var info = await bucket.info('remoteDirectory/remoteFile.jpg');
+    // expect(info.downloadLink != null, true);
 
-    print(info.downloadLink);
+    // print(info.downloadLink);
   });
 
   await test('Storage list', () async {

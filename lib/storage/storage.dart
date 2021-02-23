@@ -4,11 +4,49 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:io';
 
-import 'package:firedart/storage/firebase_metadata.dart';
+import 'package:firedart/storage/metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
-import 'package:firedart/storage/firebase_storage_platform.dart';
+import 'package:firedart/storage/storage_platform.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
+
+class StorageBucketListItem {
+  FirebaseStorage storage;
+  String name;
+  String bucket;
+
+  StorageBucketListItem({this.name, this.bucket, this.storage});
+
+  factory StorageBucketListItem.fromMap(
+          FirebaseStorage storage, Map<String, dynamic> map) =>
+      StorageBucketListItem(
+          name: map['name'], bucket: map['bucket'], storage: storage);
+
+  String getFilename() {
+    if ((name == null || name.isEmpty)) return '';
+    var i = name.lastIndexOf('/');
+    return name.substring(i + 1);
+  }
+
+  String getDirectory() {
+    if (name == null || name.isEmpty) return '';
+    var i = name.lastIndexOf('/');
+    return i == -1 ? name : name.substring(0, i);
+  }
+
+  FirebaseStorageReference getReference() =>
+      FirebaseStorageReference(storage, name);
+
+  @override
+  String toString() => name;
+}
+
+class StorageBucketList {
+  StorageBucketList.fromMap(Map<String, dynamic> _map);
+  List<StorageBucketListItem> items;
+  List<String> prefixes;
+  String nextPageToken;
+}
 
 class FirebaseStorage {
   final String storageBucket;
@@ -39,18 +77,8 @@ class FirebaseStorageReference {
     );
   }
 
-  Future<dynamic> list() async {
-    var requestUrl = _getReferenceUrl();
-    try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var result = await http.read(Uri.parse(requestUrl),
-          headers: {'Authorization': 'Firebase $token'});
-
-      return jsonDecode(result);
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
-    }
+  Future<dynamic> listAll() async {
+    return await _internalRequest(_getListUrl(forPrefix: false));
   }
 
   Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
@@ -175,10 +203,6 @@ class FirebaseStorageReference {
     }
   }
 
-  String _getReferenceUrl() {
-    return '${_firebaseStorageEndpoint}${storage.storageBucket}/${_pointer.path}}';
-  }
-
   String _getTargetUrl() {
     return '${_firebaseStorageEndpoint}${storage.storageBucket}/o?name=${_getEscapedPath()}';
   }
@@ -195,6 +219,49 @@ class FirebaseStorageReference {
     return Uri.encodeComponent(_pointer.path);
   }
 
+  String _getListUrl({
+    FirebaseStorageReference child,
+    bool forPrefix,
+    int maxResults = 1000,
+    String pageToken,
+  }) {
+    if (maxResults > 1000 || maxResults < 1) {
+      throw Exception(
+          'maxResults must be a positive value between 1 and 1000 inclusive.');
+    }
+
+    String reqUrl;
+    var sb = storage.storageBucket.replaceFirst('.appspot.com', '');
+    var first = true;
+
+    reqUrl = '{${_firebaseStorageEndpoint}{$sb}/o/?';
+
+    if (child != null) {
+      reqUrl += 'prefix=${child._getEscapedPath()}${Uri.encodeComponent("/")}';
+      first = false;
+    }
+
+    if (pageToken != null && pageToken.isNotEmpty) {
+      if (!first) {
+        reqUrl += '&';
+      } else {
+        first = false;
+      }
+      reqUrl += 'pageToken=$pageToken';
+    }
+
+    if (!first) {
+      reqUrl += '&';
+    }
+    reqUrl += 'maxResults=$maxResults';
+
+    if (forPrefix) {
+      reqUrl += '&delimiter=/';
+    }
+
+    return reqUrl;
+  }
+
   Future<Map<String, dynamic>> _performFetch() async {
     var requestUrl = _getDownloadUrl();
     try {
@@ -206,6 +273,21 @@ class FirebaseStorageReference {
       return jsonDecode(result);
     } catch (ex) {
       throw Exception([requestUrl, ex]);
+    }
+  }
+
+  Future<dynamic> _internalRequest(String fullUrl) async {
+    try {
+      var http = storage.auth.httpClient;
+      var result = await http.get(Uri.parse(fullUrl));
+
+      if (result.statusCode != 200) {
+        throw Exception('Server responded with error: ${result.statusCode}');
+      }
+      var bucket = jsonDecode(result.body);
+      return bucket;
+    } catch (ex) {
+      throw Exception([fullUrl, ex]);
     }
   }
 }
