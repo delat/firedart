@@ -54,7 +54,7 @@ class TokenProvider {
 
   Future _refresh() async {
     var response = await client.post(
-      'https://securetoken.googleapis.com/v1/token',
+      Uri.parse('https://securetoken.googleapis.com/v1/token'),
       body: {
         'grant_type': 'refresh_token',
         'refresh_token': _tokenStore.refreshToken,

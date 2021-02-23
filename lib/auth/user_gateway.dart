@@ -40,7 +40,7 @@ class UserGateway {
         'https://identitytoolkit.googleapis.com/v1/accounts:$method';
 
     var response = await _client.post(
-      requestUrl,
+      Uri.parse(requestUrl),
       body: body,
     );
 

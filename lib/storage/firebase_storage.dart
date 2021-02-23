@@ -6,21 +6,17 @@ import 'dart:io';
 
 import 'package:firedart/storage/firebase_metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
+import 'package:mime/mime.dart';
+import 'package:path/path.dart' as p;
 
 class FirebaseStorage {
   final String storageBucket;
-  FirebaseAuth auth;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
-  FirebaseStorage(this.storageBucket) {
-    try {
-      auth = FirebaseAuth.instance;
-    } catch (e) {
-      throw Exception('Firebase is not initialized');
-    }
-  }
+  FirebaseStorage.instanceFor(this.storageBucket);
 
-  FirebaseStorageReference child(String childRoot) {
-    return FirebaseStorageReference(this, childRoot);
+  FirebaseStorageReference ref(String path) {
+    return FirebaseStorageReference(this, path ?? '/');
   }
 }
 
@@ -41,42 +37,83 @@ class FirebaseStorageReference {
     return this;
   }
 
-  Future<void> upload(Uint8List data,
-      {void Function(int value) onProgress}) async {
-    var url = _getTargetUrl();
+  Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
+    var requestUrl = _getTargetUrl();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var result = await http.post(url,
-          headers: {'Authorization': 'Firebase $token'}, body: data);
+      var headers = {
+        'Authorization': 'Firebase $token',
+        'Content-Type': 'application/octet-stream',
+      };
+      if (metadata != null) {
+        headers.addAll(metadata.asMap());
+      }
+      var result =
+          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
 
       if (result.statusCode != 200) {
         throw Exception('Server responded with error: ${result.statusCode}');
       }
     } catch (ex) {
-      throw Exception([url, ex]);
+      throw Exception([requestUrl, ex]);
     }
   }
 
-  Future<Uint8List> download() async {
-    var downloadUrl = await getDownloadUrl();
+  Future<void> putFile(File file, {SettableMetadata metadata}) async {
+    var requestUrl = _getTargetUrl();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var file = await http.readBytes(downloadUrl,
-          headers: {'Authorization': 'Firebase $token'});
-      return file;
+      var data = await file.readAsBytes();
+      var headers = {
+        'Authorization': 'Firebase $token',
+        'Content-Type':
+            lookupMimeType(p.basename(file.path)) ?? 'application/octet-stream',
+      };
+      if (metadata != null) {
+        headers.addAll(metadata.asMap());
+      }
+      var result =
+          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
+
+      if (result.statusCode != 200) {
+        throw Exception('Server responded with error: ${result.statusCode}');
+      }
     } catch (ex) {
-      throw Exception([downloadUrl, ex]);
+      throw Exception([requestUrl, ex]);
+    }
+  }
+
+  Future<void> putString(String data, {SettableMetadata metadata}) async {
+    var requestUrl = _getTargetUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var headers = {
+        'Authorization': 'Firebase $token',
+        'Content-Type': 'text/plain',
+      };
+      if (metadata != null) {
+        headers.addAll(metadata.asMap());
+      }
+      var result =
+          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
+
+      if (result.statusCode != 200) {
+        throw Exception('Server responded with error: ${result.statusCode}');
+      }
+    } catch (ex) {
+      throw Exception([requestUrl, ex]);
     }
   }
 
   Future<void> writeToFile(File file) async {
-    var downloadUrl = await getDownloadUrl();
+    var requestUrl = await getDownloadUrl();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var data = await http.readBytes(downloadUrl,
+      var data = await http.readBytes(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
 
       if (file.existsSync() == false) {
@@ -85,7 +122,7 @@ class FirebaseStorageReference {
 
       await file.writeAsBytes(data);
     } catch (ex) {
-      throw Exception([downloadUrl, ex]);
+      throw Exception([requestUrl, ex]);
     }
   }
 
@@ -99,26 +136,26 @@ class FirebaseStorageReference {
     return _getFullDownloadUrl() + data['downloadTokens'];
   }
 
-  Future<FirebaseMetaData> getMetaData() async {
+  Future<FullMetadata> getMetaData() async {
     var data = await _performFetch();
-    return FirebaseMetaData.fromMap(data);
+    return FullMetadata.fromMap(data);
   }
 
   Future<void> delete() async {
-    var url = _getDownloadUrl();
+    var requestUrl = _getDownloadUrl();
     var resultContent = 'N/A';
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var result =
-          await http.delete(url, headers: {'Authorization': 'Firebase $token'});
+      var result = await http.delete(Uri.parse(requestUrl),
+          headers: {'Authorization': 'Firebase $token'});
       resultContent = result.body;
 
       if (result.statusCode != 200) {
         throw Exception('Server responded with error: ${result.statusCode}');
       }
     } catch (ex) {
-      throw Exception([url, resultContent, ex]);
+      throw Exception([requestUrl, resultContent, ex]);
     }
   }
 
@@ -139,16 +176,16 @@ class FirebaseStorageReference {
   }
 
   Future<Map<String, dynamic>> _performFetch() async {
-    var url = _getDownloadUrl();
+    var requestUrl = _getDownloadUrl();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var result =
-          await http.read(url, headers: {'Authorization': 'Firebase $token'});
+      var result = await http.read(Uri.parse(requestUrl),
+          headers: {'Authorization': 'Firebase $token'});
 
       return jsonDecode(result);
     } catch (ex) {
-      throw Exception([url, ex]);
+      throw Exception([requestUrl, ex]);
     }
   }
 }
