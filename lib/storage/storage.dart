@@ -42,10 +42,19 @@ class StorageBucketListItem {
 }
 
 class StorageBucketList {
-  StorageBucketList.fromMap(Map<String, dynamic> _map);
-  List<StorageBucketListItem> items;
-  List<String> prefixes;
+  List<StorageBucketListItem> items = [];
+  List<String> prefixes = [];
   String nextPageToken;
+  StorageBucketList.fromMap({
+    FirebaseStorage storage,
+    Map<String, dynamic> map,
+  }) {
+    prefixes = map['prefixes'].cast<String>();
+    nextPageToken = map['nextPagetoken'];
+    for (var item in map['items']) {
+      items.add(StorageBucketListItem.fromMap(storage, item));
+    }
+  }
 }
 
 class FirebaseStorage {
@@ -78,7 +87,7 @@ class FirebaseStorageReference {
   }
 
   Future<dynamic> listAll() async {
-    return await _internalRequest(_getListUrl(forPrefix: false));
+    return await _internalRequest(_getListUrl());
   }
 
   Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
@@ -97,7 +106,8 @@ class FirebaseStorageReference {
           await http.post(Uri.parse(requestUrl), headers: headers, body: data);
 
       if (result.statusCode != 200) {
-        throw Exception('Server responded with error: ${result.statusCode}');
+        throw Exception(
+            'Server responded with error ${result.statusCode}: ${result.body}');
       }
     } catch (ex) {
       throw Exception([requestUrl, ex]);
@@ -122,7 +132,8 @@ class FirebaseStorageReference {
           await http.post(Uri.parse(requestUrl), headers: headers, body: data);
 
       if (result.statusCode != 200) {
-        throw Exception('Server responded with error: ${result.statusCode}');
+        throw Exception(
+            'Server responded with error ${result.statusCode}: ${result.body}');
       }
     } catch (ex) {
       throw Exception([requestUrl, ex]);
@@ -145,7 +156,8 @@ class FirebaseStorageReference {
           await http.post(Uri.parse(requestUrl), headers: headers, body: data);
 
       if (result.statusCode != 200) {
-        throw Exception('Server responded with error: ${result.statusCode}');
+        throw Exception(
+            'Server responded with error ${result.statusCode}: ${result.body}');
       }
     } catch (ex) {
       throw Exception([requestUrl, ex]);
@@ -196,7 +208,8 @@ class FirebaseStorageReference {
       resultContent = result.body;
 
       if (result.statusCode != 200) {
-        throw Exception('Server responded with error: ${result.statusCode}');
+        throw Exception(
+            'Server responded with error ${result.statusCode}: ${result.body}');
       }
     } catch (ex) {
       throw Exception([requestUrl, resultContent, ex]);
@@ -220,8 +233,6 @@ class FirebaseStorageReference {
   }
 
   String _getListUrl({
-    FirebaseStorageReference child,
-    bool forPrefix,
     int maxResults = 1000,
     String pageToken,
   }) {
@@ -231,32 +242,15 @@ class FirebaseStorageReference {
     }
 
     String reqUrl;
-    var first = true;
-
     reqUrl = '${_firebaseStorageEndpoint}${storage.storageBucket}/o/?';
-
-    if (child != null) {
-      reqUrl += 'prefix=${child._getEscapedPath()}${Uri.encodeComponent("/")}';
-      first = false;
-    }
+    reqUrl += 'prefix=${_pointer.isRoot ? '' : _pointer.path}';
 
     if (pageToken != null && pageToken.isNotEmpty) {
-      if (!first) {
-        reqUrl += '&';
-      } else {
-        first = false;
-      }
-      reqUrl += 'pageToken=$pageToken';
+      reqUrl += '&pageToken=$pageToken';
     }
 
-    if (!first) {
-      reqUrl += '&';
-    }
-    reqUrl += 'maxResults=$maxResults';
-
-    if (forPrefix) {
-      reqUrl += '&delimiter=/';
-    }
+    reqUrl += '&maxResults=$maxResults';
+    reqUrl += '&delimiter=${Uri.encodeComponent("/")}';
 
     return reqUrl;
   }
@@ -275,7 +269,7 @@ class FirebaseStorageReference {
     }
   }
 
-  Future<dynamic> _internalRequest(String fullUrl) async {
+  Future<StorageBucketList> _internalRequest(String fullUrl) async {
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
@@ -283,9 +277,13 @@ class FirebaseStorageReference {
           headers: {'Authorization': 'Firebase $token'});
 
       if (result.statusCode != 200) {
-        throw Exception('Server responded with error: ${result.statusCode}');
+        throw Exception(
+            'Server responded with error ${result.statusCode}: ${result.body}');
       }
-      var bucket = jsonDecode(result.body);
+      var bucket = StorageBucketList.fromMap(
+        storage: storage,
+        map: jsonDecode(result.body),
+      );
       return bucket;
     } catch (ex) {
       throw Exception([fullUrl, ex]);
