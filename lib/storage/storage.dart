@@ -243,7 +243,8 @@ class FirebaseStorageReference {
 
     String reqUrl;
     reqUrl = '${_firebaseStorageEndpoint}${storage.storageBucket}/o/?';
-    reqUrl += 'prefix=${_pointer.isRoot ? '' : _pointer.path}';
+    reqUrl +=
+        'prefix=${_pointer.isRoot ? '' : _pointer.path + Uri.encodeComponent("/")}';
 
     if (pageToken != null && pageToken.isNotEmpty) {
       reqUrl += '&pageToken=$pageToken';
