@@ -1,4 +1,5 @@
 import 'dart:core';
+import 'dart:convert';
 
 class SettableMetadata {
   /// Creates a new [SettableMetadata] instance.
@@ -30,14 +31,15 @@ class SettableMetadata {
   final Map<String, String> customMetadata;
 
   /// Returns the settable metadata as a [Map].
-  Map<String, dynamic> asMap() {
-    return <String, dynamic>{
+  Map<String, String> asMap() {
+    return <String, String>{
       'cacheControl': cacheControl,
       'contentDisposition': contentDisposition,
       'contentEncoding': contentEncoding,
       'contentLanguage': contentLanguage,
       'contentType': contentType,
-      'customMetadata': customMetadata,
+      'customMetadata':
+          customMetadata != null ? jsonEncode(customMetadata) : null,
     };
   }
 }
