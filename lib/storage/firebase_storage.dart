@@ -6,6 +6,7 @@ import 'dart:io';
 
 import 'package:firedart/storage/firebase_metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
+import 'package:firedart/storage/firebase_storage_platform.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
@@ -25,16 +26,17 @@ class FirebaseStorageReference {
       'https://firebasestorage.googleapis.com/v0/b/';
 
   final FirebaseStorage storage;
-  List<String> children;
+  Pointer _pointer;
 
   FirebaseStorageReference(this.storage, String childRoot) {
-    children = [];
-    children.add(childRoot);
+    _pointer = Pointer(childRoot);
   }
 
-  FirebaseStorageReference child(String name) {
-    children.add(name);
-    return this;
+  FirebaseStorageReference child(String path) {
+    return FirebaseStorageReference(
+      storage,
+      _pointer.child(path),
+    );
   }
 
   Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
@@ -172,7 +174,7 @@ class FirebaseStorageReference {
   }
 
   String _getEscapedPath() {
-    return Uri.encodeComponent(children.join('/'));
+    return Uri.encodeComponent(_pointer.path);
   }
 
   Future<Map<String, dynamic>> _performFetch() async {
