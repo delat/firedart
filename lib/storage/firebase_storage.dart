@@ -138,7 +138,7 @@ class FirebaseStorageReference {
 
   Future<FullMetadata> getMetaData() async {
     var data = await _performFetch();
-    return FullMetadata.fromMap(data);
+    return FullMetadata(data);
   }
 
   Future<void> delete() async {
