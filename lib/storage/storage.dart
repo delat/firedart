@@ -278,7 +278,9 @@ class FirebaseStorageReference {
   Future<dynamic> _internalRequest(String fullUrl) async {
     try {
       var http = storage.auth.httpClient;
-      var result = await http.get(Uri.parse(fullUrl));
+      var token = await storage.auth.tokenProvider.idToken;
+      var result = await http.get(Uri.parse(fullUrl),
+          headers: {'Authorization': 'Firebase $token'});
 
       if (result.statusCode != 200) {
         throw Exception('Server responded with error: ${result.statusCode}');
