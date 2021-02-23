@@ -15,7 +15,7 @@ class FirebaseStorage {
 
   FirebaseStorage.instanceFor(this.storageBucket);
 
-  FirebaseStorageReference ref(String path) {
+  FirebaseStorageReference ref([String path]) {
     return FirebaseStorageReference(this, path ?? '/');
   }
 }
