@@ -39,6 +39,20 @@ class FirebaseStorageReference {
     );
   }
 
+  Future<dynamic> list() async {
+    var requestUrl = _getReferenceUrl();
+    try {
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var result = await http.read(Uri.parse(requestUrl),
+          headers: {'Authorization': 'Firebase $token'});
+
+      return jsonDecode(result);
+    } catch (ex) {
+      throw Exception([requestUrl, ex]);
+    }
+  }
+
   Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
     var requestUrl = _getTargetUrl();
     try {
@@ -159,6 +173,10 @@ class FirebaseStorageReference {
     } catch (ex) {
       throw Exception([requestUrl, resultContent, ex]);
     }
+  }
+
+  String _getReferenceUrl() {
+    return '${_firebaseStorageEndpoint}${storage.storageBucket}/${_pointer.path}}';
   }
 
   String _getTargetUrl() {
