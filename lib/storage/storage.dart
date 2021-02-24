@@ -91,78 +91,115 @@ class FirebaseStorageReference {
     return await _internalRequest(_getListUrl());
   }
 
-  Future<void> putData(Uint8List data, {SettableMetadata metadata}) async {
+  Future<void> putData(Uint8List data,
+      {void Function(int progress) onProgress}) async {
     var requestUrl = _getTargetUrl();
+    var res = Completer();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var headers = {
-        'Authorization': 'Firebase $token',
-        'Content-Type': 'application/octet-stream',
-      };
-      if (metadata != null) {
-        headers.addAll(metadata.asMap());
-      }
-      var result =
-          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
+      var request = Request('POST', Uri.parse(requestUrl));
+      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+      request.headers[HttpHeaders.contentTypeHeader] =
+          'application/octet-stream';
+      var response = http.send(request);
 
-      if (result.statusCode != 200) {
-        throw Exception(
-            'Server responded with error ${result.statusCode}: ${result.body}');
-      }
+      var uploaded = 0;
+      response.asStream().listen((StreamedResponse r) {
+        if (r.statusCode != 200) {
+          throw Exception(
+              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+        }
+        r.stream.listen(
+          (List<int> chunk) {
+            // Display percentage of completion
+            if (onProgress != null) {
+              onProgress((uploaded * 100) ~/ r.contentLength);
+            }
+            uploaded += chunk.length;
+          },
+          onDone: () => res.complete(),
+          onError: (error) => throw Exception([requestUrl, error]),
+        );
+      });
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
+
+    return res.future;
   }
 
-  Future<void> putFile(File file, {SettableMetadata metadata}) async {
+  Future<void> putFile(File file,
+      {void Function(int progress) onProgress}) async {
     var requestUrl = _getTargetUrl();
+    var res = Completer();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
       var data = await file.readAsBytes();
-      var headers = {
-        'Authorization': 'Firebase $token',
-        'Content-Type':
-            lookupMimeType(p.basename(file.path)) ?? 'application/octet-stream',
-      };
-      if (metadata != null) {
-        headers.addAll(metadata.asMap());
-      }
-      var result =
-          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
+      var request = Request('POST', Uri.parse(requestUrl));
+      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+      request.headers[HttpHeaders.contentTypeHeader] =
+          lookupMimeType(p.basename(file.path)) ?? 'application/octet-stream';
+      var response = http.send(request);
 
-      if (result.statusCode != 200) {
-        throw Exception(
-            'Server responded with error ${result.statusCode}: ${result.body}');
-      }
+      var uploaded = 0;
+      response.asStream().listen((StreamedResponse r) {
+        if (r.statusCode != 200) {
+          throw Exception(
+              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+        }
+        r.stream.listen(
+          (List<int> chunk) {
+            // Display percentage of completion
+            if (onProgress != null) {
+              onProgress((uploaded * 100) ~/ r.contentLength);
+            }
+            uploaded += chunk.length;
+          },
+          onDone: () => res.complete(),
+          onError: (error) => throw Exception([requestUrl, error]),
+        );
+      });
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
   }
 
-  Future<void> putString(String data, {SettableMetadata metadata}) async {
+  Future<void> putString(String data,
+      {void Function(int progress) onProgress}) async {
     var requestUrl = _getTargetUrl();
+    var res = Completer();
     try {
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
-      var headers = {
-        'Authorization': 'Firebase $token',
-        'Content-Type': 'text/plain',
-      };
-      if (metadata != null) {
-        headers.addAll(metadata.asMap());
-      }
-      var result =
-          await http.post(Uri.parse(requestUrl), headers: headers, body: data);
+      var request = Request('POST', Uri.parse(requestUrl));
+      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+      request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
+      var response = http.send(request);
 
-      if (result.statusCode != 200) {
-        throw Exception(
-            'Server responded with error ${result.statusCode}: ${result.body}');
-      }
+      var uploaded = 0;
+      response.asStream().listen((StreamedResponse r) {
+        if (r.statusCode != 200) {
+          throw Exception(
+              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+        }
+        r.stream.listen(
+          (List<int> chunk) {
+            // Display percentage of completion
+            if (onProgress != null) {
+              onProgress((uploaded * 100) ~/ r.contentLength);
+            }
+            uploaded += chunk.length;
+          },
+          onDone: () => res.complete(),
+          onError: (error) => throw Exception([requestUrl, error]),
+        );
+      });
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
+    return res.future;
   }
 
   Future<void> writeToFile(File file,
@@ -184,25 +221,31 @@ class FirebaseStorageReference {
       var downloaded = 0;
 
       response.asStream().listen((StreamedResponse r) {
-        r.stream.listen((List<int> chunk) {
-          // Display percentage of completion
-          if (onProgress != null) {
-            onProgress((downloaded * 100) ~/ r.contentLength);
-          }
-          chunks.add(chunk);
-          downloaded += chunk.length;
-        }, onDone: () async {
-          final bytes = Uint8List(r.contentLength);
-          var offset = 0;
-          for (var chunk in chunks) {
-            bytes.setRange(offset, offset + chunk.length, chunk);
-            offset += chunk.length;
-          }
-          await file.writeAsBytes(bytes);
-          res.complete();
-        }, onError: (error) {
-          throw Exception([requestUrl, error]);
-        });
+        if (r.statusCode != 200) {
+          throw Exception(
+              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+        }
+        r.stream.listen(
+          (List<int> chunk) {
+            // Display percentage of completion
+            if (onProgress != null) {
+              onProgress((downloaded * 100) ~/ r.contentLength);
+            }
+            chunks.add(chunk);
+            downloaded += chunk.length;
+          },
+          onDone: () async {
+            final bytes = Uint8List(r.contentLength);
+            var offset = 0;
+            for (var chunk in chunks) {
+              bytes.setRange(offset, offset + chunk.length, chunk);
+              offset += chunk.length;
+            }
+            await file.writeAsBytes(bytes);
+            res.complete();
+          },
+          onError: (error) => throw Exception([requestUrl, error]),
+        );
       });
     } catch (ex) {
       throw Exception([requestUrl, ex]);
