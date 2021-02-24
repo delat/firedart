@@ -102,6 +102,7 @@ class FirebaseStorageReference {
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] =
           'application/octet-stream';
+      request.bodyBytes = data;
       var response = http.send(request);
 
       var uploaded = 0;
@@ -141,6 +142,7 @@ class FirebaseStorageReference {
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] =
           lookupMimeType(p.basename(file.path)) ?? 'application/octet-stream';
+      request.bodyBytes = data;
       var response = http.send(request);
 
       var uploaded = 0;
@@ -164,6 +166,8 @@ class FirebaseStorageReference {
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
+
+    return res.future;
   }
 
   Future<void> putString(String data,
@@ -176,6 +180,7 @@ class FirebaseStorageReference {
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
+      request.body = data;
       var response = http.send(request);
 
       var uploaded = 0;
@@ -199,6 +204,7 @@ class FirebaseStorageReference {
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
+
     return res.future;
   }
 
