@@ -1,12 +1,10 @@
-import 'dart:convert';
-
 import 'package:firedart/auth/firebase_auth.dart';
 
 import 'firestore_gateway.dart';
 import 'models.dart';
 
 abstract class FieldValue {
-  static Object serverTimestamp() => {'sv': 'timestamp'};
+  static Object serverTimestamp() => {'.sv': 'timestamp'};
 }
 
 class Firestore {
