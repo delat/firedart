@@ -4,7 +4,7 @@ import 'firestore_gateway.dart';
 import 'models.dart';
 
 abstract class FieldValue {
-  static Object serverTimestamp() => {'.sv': 'timestamp'};
+  static Map<String, String> serverTimestamp() => {'.sv': 'timestamp'};
 }
 
 class Firestore {
