@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:firedart/storage/metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:firedart/storage/storage_platform.dart';
+import 'package:http/http.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
@@ -164,22 +165,50 @@ class FirebaseStorageReference {
     }
   }
 
-  Future<void> writeToFile(File file) async {
+  Future<void> writeToFile(File file,
+      {void Function(int progress) onProgress}) async {
     var requestUrl = await getDownloadUrl();
+    var res = Completer();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var data = await http.readBytes(Uri.parse(requestUrl),
-          headers: {'Authorization': 'Firebase $token'});
-
       if (file.existsSync() == false) {
         await file.create();
       }
 
-      await file.writeAsBytes(data);
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var request = Request('GET', Uri.parse(requestUrl));
+      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+      var response = http.send(request);
+
+      var chunks = <List<int>>[];
+      var downloaded = 0;
+
+      response.asStream().listen((StreamedResponse r) {
+        r.stream.listen((List<int> chunk) {
+          // Display percentage of completion
+          if (onProgress != null) {
+            onProgress((downloaded * 100) ~/ r.contentLength);
+          }
+          chunks.add(chunk);
+          downloaded += chunk.length;
+        }, onDone: () async {
+          final bytes = Uint8List(r.contentLength);
+          var offset = 0;
+          for (var chunk in chunks) {
+            bytes.setRange(offset, offset + chunk.length, chunk);
+            offset += chunk.length;
+          }
+          await file.writeAsBytes(bytes);
+          res.complete();
+        }, onError: (error) {
+          throw Exception([requestUrl, error]);
+        });
+      });
     } catch (ex) {
       throw Exception([requestUrl, ex]);
     }
+
+    return res.future;
   }
 
   Future<String> getDownloadUrl() async {
