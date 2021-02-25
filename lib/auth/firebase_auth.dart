@@ -56,27 +56,28 @@ class FirebaseAuth {
 
   String get userId => tokenProvider.userId;
 
-  Future<User> signUp(String email, String password) =>
+  Future<User> signUp(String email, String password) async =>
       _authGateway.signUp(email, password);
 
-  Future<User> signIn(String email, String password) =>
+  Future<User> signIn(String email, String password) async =>
       _authGateway.signIn(email, password);
 
-  Future<User> signInAnonymously() => _authGateway.signInAnonymously();
+  Future<User> signInAnonymously() async => _authGateway.signInAnonymously();
 
   void signOut() => tokenProvider.signOut();
 
-  Future<void> resetPassword(String email) => _authGateway.resetPassword(email);
+  Future<void> resetPassword(String email) async =>
+      _authGateway.resetPassword(email);
 
-  Future<void> requestEmailVerification() =>
+  Future<void> requestEmailVerification() async =>
       _userGateway.requestEmailVerification();
 
-  Future<void> changePassword(String password) =>
+  Future<void> changePassword(String password) async =>
       _userGateway.changePassword(password);
 
-  Future<User> getUser() => _userGateway.getUser();
+  Future<User> getUser() async => _userGateway.getUser();
 
-  Future<void> updateProfile({String displayName, String photoUrl}) =>
+  Future<void> updateProfile({String displayName, String photoUrl}) async =>
       _userGateway.updateProfile(displayName, photoUrl);
 
   Future<void> deleteAccount() async {

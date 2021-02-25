@@ -20,7 +20,7 @@ class AuthGateway {
 
   Future<User> signInAnonymously() async => _auth('signUp', {});
 
-  Future<void> resetPassword(String email) => _post('sendOobCode', {
+  Future<void> resetPassword(String email) async => _post('sendOobCode', {
         'requestType': 'PASSWORD_RESET',
         'email': email,
       });

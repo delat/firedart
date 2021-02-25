@@ -3,10 +3,6 @@ import 'package:firedart/auth/firebase_auth.dart';
 import 'firestore_gateway.dart';
 import 'models.dart';
 
-abstract class FieldValue {
-  static Map<String, String> serverTimestamp() => {'.sv': 'timestamp'};
-}
-
 class Firestore {
   /* Singleton interface */
   static Firestore _instance;
