@@ -12,15 +12,15 @@ class AuthGateway {
 
   AuthGateway(this.client, this.tokenProvider);
 
-  Future<User> signUp(String email, String password) async =>
+  Future<User> signUp(String email, String password) =>
       _auth('signUp', {'email': email, 'password': password});
 
-  Future<User> signIn(String email, String password) async =>
+  Future<User> signIn(String email, String password) =>
       _auth('signInWithPassword', {'email': email, 'password': password});
 
-  Future<User> signInAnonymously() async => _auth('signUp', {});
+  Future<User> signInAnonymously() => _auth('signUp', {});
 
-  Future<void> resetPassword(String email) async => _post('sendOobCode', {
+  Future<void> resetPassword(String email) => _post('sendOobCode', {
         'requestType': 'PASSWORD_RESET',
         'email': email,
       });
