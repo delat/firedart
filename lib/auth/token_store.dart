@@ -23,7 +23,7 @@ abstract class TokenStore {
     await write(_token);
   }
 
-  Future<void> init() async {
+  Future<void> initialize() async {
     _token = await read();
   }
 

@@ -5,6 +5,7 @@ import 'package:firedart/generated/google/firestore/v1/document.pb.dart' as fs;
 import 'package:firedart/generated/google/firestore/v1/firestore.pbgrpc.dart';
 import 'package:firedart/generated/google/firestore/v1/query.pb.dart';
 import 'package:grpc/grpc.dart';
+import 'package:rxdart/rxdart.dart';
 
 import '../auth/token_authenticator.dart';
 import '../firedart.dart';
@@ -15,13 +16,13 @@ class _FirestoreGatewayStreamCache {
   String userInfo;
   void Function(Object e) onError;
 
-  StreamController<ListenRequest> _listenRequestStreamController;
-  StreamController<ListenResponse> _listenResponseStreamController;
+  PublishSubject<ListenRequest> _listenRequestSubject;
+  PublishSubject<ListenResponse> _listenResponseSubject;
   Map<String, Document> _documentMap;
 
   bool _shouldCleanup;
 
-  Stream<ListenResponse> get stream => _listenResponseStreamController.stream;
+  Stream<ListenResponse> get stream => _listenResponseSubject.stream;
   Map<String, Document> get documentMap => _documentMap;
 
   _FirestoreGatewayStreamCache({this.onDone, this.userInfo, this.onError}) {
@@ -31,20 +32,20 @@ class _FirestoreGatewayStreamCache {
   void setListenRequest(
       ListenRequest request, FirestoreClient client, String database) {
     // Close the request stream if this function is called for a second time;
-    _listenRequestStreamController?.close();
+    _listenRequestSubject?.close();
 
     _documentMap = <String, Document>{};
-    _listenRequestStreamController = StreamController<ListenRequest>();
-    _listenResponseStreamController =
-        StreamController<ListenResponse>.broadcast(
-            onListen: _handleListenOnResponseStream,
-            onCancel: _handleCancelOnResponseStream);
-    _listenResponseStreamController.addStream(client
-        .listen(_listenRequestStreamController.stream,
+    _listenRequestSubject = PublishSubject<ListenRequest>();
+    _listenResponseSubject = PublishSubject<ListenResponse>(
+      onListen: _handleListenOnResponseStream,
+      onCancel: _handleCancelOnResponseStream,
+    );
+    _listenResponseSubject.addStream(client
+        .listen(_listenRequestSubject.stream,
             options: CallOptions(
                 metadata: {'google-cloud-resource-prefix': database}))
         .handleError(onError));
-    _listenRequestStreamController.add(request);
+    _listenRequestSubject.add(request);
   }
 
   void _handleListenOnResponseStream() {
@@ -63,7 +64,7 @@ class _FirestoreGatewayStreamCache {
     }
     onDone?.call(userInfo);
     // Clean up stream resources
-    _listenRequestStreamController.close();
+    _listenRequestSubject.close();
   }
 
   void _handleErrorStub(e) {

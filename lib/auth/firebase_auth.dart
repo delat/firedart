@@ -4,6 +4,9 @@ import 'package:firedart/auth/token_provider.dart';
 import 'package:firedart/auth/token_store.dart';
 import 'package:firedart/auth/user_gateway.dart';
 import 'package:http/http.dart' as http;
+import 'package:rxdart/rxdart.dart';
+
+import 'service_account.dart';
 
 /// For service accounts, you can use ServiceAccount.fromJson(String) or ServiceAccount.fromEnvironmentVariable(optional String)
 /// Using the environment variable implementation will crash if you are on a platform that dart:io does not support.
@@ -14,11 +17,13 @@ class FirebaseAuth {
   /* Singleton interface */
   static FirebaseAuth _instance;
 
-  static FirebaseAuth initialize(String apiKey, TokenStore tokenStore) {
+  static FirebaseAuth initialize(String apiKey, TokenStore tokenStore,
+      {ServiceAccount serviceAccount}) {
     if (_instance != null) {
       throw Exception('FirebaseAuth instance was already initialized');
     }
-    _instance = FirebaseAuth(apiKey, tokenStore);
+    _instance =
+        FirebaseAuth(apiKey, tokenStore, serviceAccount: serviceAccount);
     return _instance;
   }
 
@@ -32,6 +37,7 @@ class FirebaseAuth {
 
   /* Instance interface */
   final String apiKey;
+  final ServiceAccount serviceAccount;
 
   http.Client httpClient;
   TokenProvider tokenProvider;
@@ -39,7 +45,8 @@ class FirebaseAuth {
   AuthGateway _authGateway;
   UserGateway _userGateway;
 
-  FirebaseAuth(this.apiKey, TokenStore tokenStore, {this.httpClient})
+  FirebaseAuth(this.apiKey, TokenStore tokenStore,
+      {this.httpClient, this.serviceAccount})
       : assert(apiKey.isNotEmpty),
         assert(tokenStore != null) {
     httpClient ??= http.Client();
@@ -52,7 +59,7 @@ class FirebaseAuth {
 
   bool get isSignedIn => tokenProvider.isSignedIn;
 
-  Stream<bool> get signInState => tokenProvider.signInState;
+  ValueStream<bool> get signInState => tokenProvider.signInState;
 
   String get userId => tokenProvider.userId;
 
@@ -61,8 +68,6 @@ class FirebaseAuth {
 
   Future<User> signIn(String email, String password) =>
       _authGateway.signIn(email, password);
-
-  Future<User> signInAnonymously() => _authGateway.signInAnonymously();
 
   void signOut() => tokenProvider.signOut();
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:firedart/auth/client.dart';
 import 'package:firedart/auth/token_store.dart';
+import 'package:rxdart/rxdart.dart';
 
 import 'exceptions.dart';
 
@@ -12,10 +13,10 @@ class TokenProvider {
   final KeyClient client;
   final TokenStore _tokenStore;
 
-  StreamController<bool> _signInStateStreamController;
+  BehaviorSubject<bool> _signInStateSubject;
 
   TokenProvider(this.client, this._tokenStore) {
-    _signInStateStreamController = StreamController<bool>();
+    _signInStateSubject = BehaviorSubject<bool>();
   }
 
   String get userId => _tokenStore.userId;
@@ -24,7 +25,7 @@ class TokenProvider {
 
   bool get isSignedIn => _tokenStore.hasToken;
 
-  Stream<bool> get signInState => _signInStateStreamController.stream;
+  ValueStream<bool> get signInState => _signInStateSubject.stream;
 
   Future<String> get idToken async {
     if (!isSignedIn) throw SignedOutException();
@@ -78,5 +79,5 @@ class TokenProvider {
     }
   }
 
-  void _notifyState() => _signInStateStreamController.add(isSignedIn);
+  void _notifyState() => _signInStateSubject.add(isSignedIn);
 }
