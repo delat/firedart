@@ -72,7 +72,7 @@ Future main() async {
 
   test('Refresh token when expired', () async {
     await auth.signIn(email, password);
-    tokenStore.expireToken();
+    await tokenStore.expireToken();
     var user = await auth.getUser();
     expect(user.email, isNotEmpty);
     expect(auth.isSignedIn, true);
@@ -80,7 +80,7 @@ Future main() async {
 
   test('Sign out on bad refresh token', () async {
     await auth.signIn(email, password);
-    tokenStore.setToken('user_id', 'bad_token', 'bad_token', 0);
+    await tokenStore.setToken('user_id', 'bad_token', 'bad_token', 0);
     await expectLater(auth.getUser(), throwsA(isA<AuthException>()));
     expect(auth.isSignedIn, false);
   });

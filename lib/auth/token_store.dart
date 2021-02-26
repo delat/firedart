@@ -11,23 +11,31 @@ abstract class TokenStore {
 
   bool get hasToken => _token != null;
 
-  void setToken(
-      String userId, String idToken, String refreshToken, int expiresIn) {
+  Future<void> setToken(
+    String userId,
+    String idToken,
+    String refreshToken,
+    int expiresIn,
+  ) async {
     assert(idToken != null && refreshToken != null && expiresIn != null);
     var expiry = DateTime.now().add(Duration(seconds: expiresIn));
     _token = Token(userId, idToken, refreshToken, expiry);
-    write(_token);
+    await write(_token);
   }
 
-  TokenStore() {
-    _token = read();
+  Future<void> init() async {
+    _token = await read();
   }
 
   /// Force refresh - useful for testing
-  void expireToken() {
+  Future<void> expireToken() async {
     _token = Token(
-        _token._userId, _token._idToken, _token._refreshToken, DateTime.now());
-    write(_token);
+      _token._userId,
+      _token._idToken,
+      _token._refreshToken,
+      DateTime.now(),
+    );
+    await write(_token);
   }
 
   void clear() {
@@ -36,25 +44,29 @@ abstract class TokenStore {
   }
 
   /// Restore the refresh token from storage, returns null if token isn't stored
-  Token read();
+  Future<Token> read();
 
   /// Persist the refresh token
-  void write(Token token);
+  Future<void> write(Token token);
 
-  void delete();
+  Future<void> delete();
 }
 
 /// Doesn't actually persist tokens. Useful for testing or in environments where
 /// persistence isn't available but it's fine signing in for each session.
 class VolatileStore extends TokenStore {
   @override
-  Token read() => null;
+  Future<Token> read() => Future.value(null);
 
   @override
-  void write(Token token) {}
+  Future<void> write(Token token) {
+    return Future.value();
+  }
 
   @override
-  void delete() {}
+  Future<void> delete() {
+    return Future.value();
+  }
 }
 
 class Token {

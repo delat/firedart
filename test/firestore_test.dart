@@ -188,14 +188,14 @@ Future main() async {
   });
 
   test('Refresh token when expired', () async {
-    tokenStore.expireToken();
+    await tokenStore.expireToken();
     var map = await firestore.collection('test').get();
     expect(auth.isSignedIn, true);
     expect(map, isNot(null));
   });
 
   test('Sign out on bad refresh token', () async {
-    tokenStore.setToken('user_id', 'bad_token', 'bad_token', 0);
+    await tokenStore.setToken('user_id', 'bad_token', 'bad_token', 0);
     try {
       await firestore.collection('test').get();
     } catch (_) {}

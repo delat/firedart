@@ -32,7 +32,7 @@ class AuthGateway {
     };
 
     var map = await _post(method, body);
-    tokenProvider.setToken(map);
+    await tokenProvider.setToken(map);
     return User.fromMap(map);
   }
 

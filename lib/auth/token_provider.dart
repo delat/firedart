@@ -37,8 +37,8 @@ class TokenProvider {
     return _tokenStore.idToken;
   }
 
-  void setToken(Map<String, dynamic> map) {
-    _tokenStore.setToken(
+  Future<void> setToken(Map<String, dynamic> map) async {
+    await _tokenStore.setToken(
       map['localId'],
       map['idToken'],
       map['refreshToken'],
@@ -64,7 +64,7 @@ class TokenProvider {
     switch (response.statusCode) {
       case 200:
         var map = json.decode(response.body);
-        _tokenStore.setToken(
+        await _tokenStore.setToken(
           map['localId'],
           map['id_token'],
           map['refresh_token'],
