@@ -16,7 +16,7 @@ class TokenProvider {
   BehaviorSubject<bool> _signInStateSubject;
 
   TokenProvider(this.client, this._tokenStore) {
-    _signInStateSubject = BehaviorSubject<bool>();
+    _signInStateSubject = BehaviorSubject<bool>.seeded(_tokenStore.hasToken);
   }
 
   String get userId => _tokenStore.userId;
