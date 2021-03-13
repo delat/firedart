@@ -13,21 +13,21 @@ class TokenProvider {
   final KeyClient client;
   final TokenStore _tokenStore;
 
-  BehaviorSubject<bool> _signInStateSubject;
+  late BehaviorSubject<bool> _signInStateSubject;
 
   TokenProvider(this.client, this._tokenStore) {
     _signInStateSubject = BehaviorSubject<bool>.seeded(_tokenStore.hasToken);
   }
 
-  String get userId => _tokenStore.userId;
+  String? get userId => _tokenStore.userId;
 
-  String get refreshToken => _tokenStore.refreshToken;
+  String? get refreshToken => _tokenStore.refreshToken;
 
   bool get isSignedIn => _tokenStore.hasToken;
 
   ValueStream<bool> get signInState => _signInStateSubject.stream;
 
-  Future<String> get idToken async {
+  Future<String?> get idToken async {
     if (!isSignedIn) throw SignedOutException();
 
     if (_tokenStore.expiry

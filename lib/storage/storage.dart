@@ -12,43 +12,43 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
 class StorageBucketListItem {
-  FirebaseStorage storage;
-  String name;
-  String bucket;
+  FirebaseStorage? storage;
+  String? name;
+  String? bucket;
 
   StorageBucketListItem({this.name, this.bucket, this.storage});
 
   factory StorageBucketListItem.fromMap(
-          FirebaseStorage storage, Map<String, dynamic> map) =>
+          FirebaseStorage? storage, Map<String, dynamic> map) =>
       StorageBucketListItem(
           name: map['name'], bucket: map['bucket'], storage: storage);
 
   String getFilename() {
-    if ((name == null || name.isEmpty)) return '';
-    var i = name.lastIndexOf('/');
-    return name.substring(i + 1);
+    if ((name == null || name!.isEmpty)) return '';
+    var i = name!.lastIndexOf('/');
+    return name!.substring(i + 1);
   }
 
-  String getDirectory() {
-    if (name == null || name.isEmpty) return '';
-    var i = name.lastIndexOf('/');
-    return i == -1 ? name : name.substring(0, i);
+  String? getDirectory() {
+    if (name == null || name!.isEmpty) return '';
+    var i = name!.lastIndexOf('/');
+    return i == -1 ? name : name!.substring(0, i);
   }
 
   FirebaseStorageReference getReference() =>
       FirebaseStorageReference(storage, name);
 
   @override
-  String toString() => name;
+  String toString() => name!;
 }
 
 class StorageBucketList {
   List<StorageBucketListItem> items = [];
-  List<String> prefixes = [];
-  String nextPageToken;
+  List<String>? prefixes = [];
+  String? nextPageToken;
   StorageBucketList.fromMap({
-    FirebaseStorage storage,
-    Map<String, dynamic> map,
+    FirebaseStorage? storage,
+    required Map<String, dynamic> map,
   }) {
     prefixes = map['prefixes'].cast<String>();
     nextPageToken = map['nextPagetoken'];
@@ -60,11 +60,11 @@ class StorageBucketList {
 
 class FirebaseStorage {
   final String storageBucket;
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseAuth? auth = FirebaseAuth.instance;
 
   FirebaseStorage.instanceFor(this.storageBucket);
 
-  FirebaseStorageReference ref([String path]) {
+  FirebaseStorageReference ref([String? path]) {
     return FirebaseStorageReference(this, path ?? '/');
   }
 }
@@ -73,10 +73,10 @@ class FirebaseStorageReference {
   static final String _firebaseStorageEndpoint =
       'https://firebasestorage.googleapis.com/v0/b/';
 
-  final FirebaseStorage storage;
-  Pointer _pointer;
+  final FirebaseStorage? storage;
+  late Pointer _pointer;
 
-  FirebaseStorageReference(this.storage, String childRoot) {
+  FirebaseStorageReference(this.storage, String? childRoot) {
     _pointer = Pointer(childRoot);
   }
 
@@ -92,12 +92,12 @@ class FirebaseStorageReference {
   }
 
   Future<void> putData(Uint8List data,
-      {void Function(int progress) onProgress}) async {
+      {void Function(int progress)? onProgress}) async {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] =
@@ -115,7 +115,7 @@ class FirebaseStorageReference {
           (List<int> chunk) {
             // Display percentage of completion
             if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength);
+              onProgress((uploaded * 100) ~/ r.contentLength!);
             }
             uploaded += chunk.length;
           },
@@ -131,12 +131,12 @@ class FirebaseStorageReference {
   }
 
   Future<void> putFile(File file,
-      {void Function(int progress) onProgress}) async {
+      {void Function(int progress)? onProgress}) async {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var data = await file.readAsBytes();
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
@@ -155,7 +155,7 @@ class FirebaseStorageReference {
           (List<int> chunk) {
             // Display percentage of completion
             if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength);
+              onProgress((uploaded * 100) ~/ r.contentLength!);
             }
             uploaded += chunk.length;
           },
@@ -171,12 +171,12 @@ class FirebaseStorageReference {
   }
 
   Future<void> putString(String data,
-      {void Function(int progress) onProgress}) async {
+      {void Function(int progress)? onProgress}) async {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
@@ -193,7 +193,7 @@ class FirebaseStorageReference {
           (List<int> chunk) {
             // Display percentage of completion
             if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength);
+              onProgress((uploaded * 100) ~/ r.contentLength!);
             }
             uploaded += chunk.length;
           },
@@ -209,7 +209,7 @@ class FirebaseStorageReference {
   }
 
   Future<void> writeToFile(File file,
-      {void Function(int progress) onProgress}) async {
+      {void Function(int progress)? onProgress}) async {
     var requestUrl = await getDownloadUrl();
     var res = Completer();
     try {
@@ -217,8 +217,8 @@ class FirebaseStorageReference {
         await file.create();
       }
 
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var request = Request('GET', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       var response = http.send(request);
@@ -235,13 +235,13 @@ class FirebaseStorageReference {
           (List<int> chunk) {
             // Display percentage of completion
             if (onProgress != null) {
-              onProgress((downloaded * 100) ~/ r.contentLength);
+              onProgress((downloaded * 100) ~/ r.contentLength!);
             }
             chunks.add(chunk);
             downloaded += chunk.length;
           },
           onDone: () async {
-            final bytes = Uint8List(r.contentLength);
+            final bytes = Uint8List(r.contentLength!);
             var offset = 0;
             for (var chunk in chunks) {
               bytes.setRange(offset, offset + chunk.length, chunk);
@@ -261,7 +261,7 @@ class FirebaseStorageReference {
   }
 
   Future<String> getDownloadUrl() async {
-    var data = await _performFetch();
+    var data = await (_performFetch() as FutureOr<Map<String, dynamic>>);
     if (data['downloadTokens'] == null) {
       throw Exception(
           'Could not extract "downloadTokens" property from response. Response: $data');
@@ -279,8 +279,8 @@ class FirebaseStorageReference {
     var requestUrl = _getDownloadUrl();
     var resultContent = 'N/A';
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var result = await http.delete(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
       resultContent = result.body;
@@ -295,11 +295,11 @@ class FirebaseStorageReference {
   }
 
   String _getTargetUrl() {
-    return '${_firebaseStorageEndpoint}${storage.storageBucket}/o?name=${_getEscapedPath()}';
+    return '${_firebaseStorageEndpoint}${storage!.storageBucket}/o?name=${_getEscapedPath()}';
   }
 
   String _getDownloadUrl() {
-    return '${_firebaseStorageEndpoint}${storage.storageBucket}/o/${_getEscapedPath()}';
+    return '${_firebaseStorageEndpoint}${storage!.storageBucket}/o/${_getEscapedPath()}';
   }
 
   String _getFullDownloadUrl() {
@@ -312,7 +312,7 @@ class FirebaseStorageReference {
 
   String _getListUrl({
     int maxResults = 1000,
-    String pageToken,
+    String? pageToken,
   }) {
     if (maxResults > 1000 || maxResults < 1) {
       throw Exception(
@@ -320,7 +320,7 @@ class FirebaseStorageReference {
     }
 
     String reqUrl;
-    reqUrl = '${_firebaseStorageEndpoint}${storage.storageBucket}/o/?';
+    reqUrl = '${_firebaseStorageEndpoint}${storage!.storageBucket}/o/?';
     reqUrl +=
         'prefix=${_pointer.isRoot ? '' : _pointer.path + Uri.encodeComponent("/")}';
 
@@ -334,11 +334,11 @@ class FirebaseStorageReference {
     return reqUrl;
   }
 
-  Future<Map<String, dynamic>> _performFetch() async {
+  Future<Map<String, dynamic>?> _performFetch() async {
     var requestUrl = _getDownloadUrl();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var result = await http.read(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
 
@@ -350,8 +350,8 @@ class FirebaseStorageReference {
 
   Future<StorageBucketList> _internalRequest(String fullUrl) async {
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
+      var http = storage!.auth!.httpClient!;
+      var token = await storage!.auth!.tokenProvider!.idToken;
       var result = await http.get(Uri.parse(fullUrl),
           headers: {'Authorization': 'Firebase $token'});
 

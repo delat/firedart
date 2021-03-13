@@ -1,6 +1,6 @@
 class Pointer {
   /// Constructs a new [Pointer] with a given path.
-  Pointer(String path) : _path = path ?? '/' {
+  Pointer(String? path) : _path = path ?? '/' {
     if (_path.isEmpty) {
       _path = '/';
     } else {
@@ -42,7 +42,7 @@ class Pointer {
   /// Returns the parent path.
   ///
   /// If the current path is root, `null` wil be returned.
-  String get parent {
+  String? get parent {
     if (isRoot) {
       return null;
     }

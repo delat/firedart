@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firedart/auth/client.dart';
@@ -6,14 +7,14 @@ import 'package:firedart/auth/token_provider.dart';
 class UserGateway {
   final UserClient _client;
 
-  UserGateway(KeyClient client, TokenProvider tokenProvider)
+  UserGateway(KeyClient client, TokenProvider? tokenProvider)
       : _client = UserClient(client, tokenProvider);
 
   Future<void> requestEmailVerification() =>
       _post('sendOobCode', {'requestType': 'VERIFY_EMAIL'});
 
   Future<User> getUser() async {
-    var map = await _post('lookup', {});
+    var map = await (_post('lookup', {}) as FutureOr<Map<String, dynamic>>);
     return User.fromMap(map['users'][0]);
   }
 
@@ -23,7 +24,7 @@ class UserGateway {
     });
   }
 
-  Future<void> updateProfile(String displayName, String photoUrl) async {
+  Future<void> updateProfile(String? displayName, String? photoUrl) async {
     await _post('update', {
       if (displayName != null) 'displayName': displayName,
       if (photoUrl != null) 'photoUrl': photoUrl,
@@ -34,7 +35,7 @@ class UserGateway {
     await _post('delete', {});
   }
 
-  Future<Map<String, dynamic>> _post<T>(
+  Future<Map<String, dynamic>?> _post<T>(
       String method, Map<String, String> body) async {
     var requestUrl =
         'https://identitytoolkit.googleapis.com/v1/accounts:$method';
@@ -49,11 +50,11 @@ class UserGateway {
 }
 
 class User {
-  final String id;
-  final String displayName;
-  final String photoUrl;
-  final String email;
-  final bool emailVerified;
+  final String? id;
+  final String? displayName;
+  final String? photoUrl;
+  final String? email;
+  final bool? emailVerified;
 
   User.fromMap(Map<String, dynamic> map)
       : id = map['localId'],

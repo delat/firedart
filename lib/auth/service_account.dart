@@ -1,7 +1,7 @@
 import 'package:firedart/io/io_access.dart';
 
 class ServiceAccount {
-  final String serviceAccountString;
+  final String? serviceAccountString;
 
   ServiceAccount.fromJson(this.serviceAccountString);
 

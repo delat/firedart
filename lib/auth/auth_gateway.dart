@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:firedart/auth/client.dart';
@@ -8,7 +9,7 @@ import 'user_gateway.dart';
 
 class AuthGateway {
   final KeyClient client;
-  final TokenProvider tokenProvider;
+  final TokenProvider? tokenProvider;
 
   AuthGateway(this.client, this.tokenProvider);
 
@@ -31,12 +32,12 @@ class AuthGateway {
       'returnSecureToken': 'true',
     };
 
-    var map = await _post(method, body);
-    await tokenProvider.setToken(map);
+    var map = await (_post(method, body) as FutureOr<Map<String, dynamic>>);
+    await tokenProvider!.setToken(map);
     return User.fromMap(map);
   }
 
-  Future<Map<String, dynamic>> _post(
+  Future<Map<String, dynamic>?> _post(
       String method, Map<String, String> body) async {
     var requestUrl =
         'https://identitytoolkit.googleapis.com/v1/accounts:$method';

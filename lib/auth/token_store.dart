@@ -1,20 +1,20 @@
 abstract class TokenStore {
-  Token _token;
+  Token? _token;
 
-  String get userId => _token._userId;
+  String? get userId => _token!._userId;
 
-  String get idToken => _token._idToken;
+  String? get idToken => _token!._idToken;
 
-  String get refreshToken => _token._refreshToken;
+  String? get refreshToken => _token!._refreshToken;
 
-  DateTime get expiry => _token._expiry;
+  DateTime get expiry => _token!._expiry;
 
   bool get hasToken => _token != null;
 
   Future<void> setToken(
-    String userId,
-    String idToken,
-    String refreshToken,
+    String? userId,
+    String? idToken,
+    String? refreshToken,
     int expiresIn,
   ) async {
     assert(idToken != null && refreshToken != null && expiresIn != null);
@@ -30,9 +30,9 @@ abstract class TokenStore {
   /// Force refresh - useful for testing
   Future<void> expireToken() async {
     _token = Token(
-      _token._userId,
-      _token._idToken,
-      _token._refreshToken,
+      _token!._userId,
+      _token!._idToken,
+      _token!._refreshToken,
       DateTime.now(),
     );
     await write(_token);
@@ -47,7 +47,7 @@ abstract class TokenStore {
   Future<Token> read();
 
   /// Persist the refresh token
-  Future<void> write(Token token);
+  Future<void> write(Token? token);
 
   Future<void> delete();
 }
@@ -59,7 +59,7 @@ class VolatileStore extends TokenStore {
   Future<Token> read() => Future.value(null);
 
   @override
-  Future<void> write(Token token) {
+  Future<void> write(Token? token) {
     return Future.value();
   }
 
@@ -70,9 +70,9 @@ class VolatileStore extends TokenStore {
 }
 
 class Token {
-  final String _userId;
-  final String _idToken;
-  final String _refreshToken;
+  final String? _userId;
+  final String? _idToken;
+  final String? _refreshToken;
   final DateTime _expiry;
 
   Token(this._userId, this._idToken, this._refreshToken, this._expiry);

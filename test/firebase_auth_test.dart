@@ -5,8 +5,8 @@ import 'package:test/test.dart';
 import 'test_config.dart';
 
 Future main() async {
-  TokenStore tokenStore;
-  FirebaseAuth auth;
+  late TokenStore tokenStore;
+  late FirebaseAuth auth;
 
   setUp(() {
     tokenStore = VolatileStore();
@@ -18,14 +18,6 @@ Future main() async {
     await auth.signIn(email, password);
     expect(auth.isSignedIn, true);
     auth.signOut();
-    expect(auth.isSignedIn, false);
-  });
-
-  test('Sign In Anonymously', () async {
-    expect(auth.isSignedIn, false);
-    await auth.signInAnonymously();
-    expect(auth.isSignedIn, true);
-    await auth.deleteAccount();
     expect(auth.isSignedIn, false);
   });
 
@@ -56,12 +48,6 @@ Future main() async {
   test('Get user id', () async {
     await auth.signIn(email, password);
     expect(auth.userId, isNotEmpty);
-  });
-
-  test('Get anonymous user id', () async {
-    await auth.signInAnonymously();
-    expect(auth.userId, isNotEmpty);
-    await auth.deleteAccount();
   });
 
   test('Get user', () async {

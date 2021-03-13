@@ -3,9 +3,9 @@ import 'dart:convert';
 class AuthException implements Exception {
   final String body;
 
-  String get message => jsonDecode(body)['error']['message'];
+  String? get message => jsonDecode(body)['error']['message'];
 
-  String get errorCode => message.split(' ')[0];
+  String get errorCode => message!.split(' ')[0];
 
   AuthException(this.body);
 
