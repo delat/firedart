@@ -208,15 +208,10 @@ class FirebaseStorageReference {
     return res.future;
   }
 
-  Future<Uint8List> getBytes(File file,
-      {void Function(int progress) onProgress}) async {
+  Future<Uint8List> getBytes({void Function(int progress) onProgress}) async {
     var requestUrl = await getDownloadUrl();
     var res = Completer<Uint8List>();
     try {
-      if (file.existsSync() == false) {
-        await file.create();
-      }
-
       var http = storage.auth.httpClient;
       var token = await storage.auth.tokenProvider.idToken;
       var request = Request('GET', Uri.parse(requestUrl));
