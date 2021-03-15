@@ -91,7 +91,7 @@ class FirebaseStorageReference {
     return await _internalRequest(_getListUrl());
   }
 
-  Future<void> putData(Uint8List data,
+  Future<void> putBytes(Uint8List data,
       {void Function(int progress) onProgress}) async {
     var requestUrl = _getTargetUrl();
     var res = Completer();
@@ -198,6 +198,57 @@ class FirebaseStorageReference {
             uploaded += chunk.length;
           },
           onDone: () => res.complete(),
+          onError: (error) => throw Exception([requestUrl, error]),
+        );
+      });
+    } catch (ex) {
+      throw Exception([requestUrl, ex]);
+    }
+
+    return res.future;
+  }
+
+  Future<Uint8List> getBytes(File file,
+      {void Function(int progress) onProgress}) async {
+    var requestUrl = await getDownloadUrl();
+    var res = Completer<Uint8List>();
+    try {
+      if (file.existsSync() == false) {
+        await file.create();
+      }
+
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
+      var request = Request('GET', Uri.parse(requestUrl));
+      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+      var response = http.send(request);
+
+      var chunks = <List<int>>[];
+      var downloaded = 0;
+
+      response.asStream().listen((StreamedResponse r) {
+        if (r.statusCode != 200) {
+          throw Exception(
+              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+        }
+        r.stream.listen(
+          (List<int> chunk) {
+            // Display percentage of completion
+            if (onProgress != null) {
+              onProgress((downloaded * 100) ~/ r.contentLength);
+            }
+            chunks.add(chunk);
+            downloaded += chunk.length;
+          },
+          onDone: () async {
+            final bytes = Uint8List(r.contentLength);
+            var offset = 0;
+            for (var chunk in chunks) {
+              bytes.setRange(offset, offset + chunk.length, chunk);
+              offset += chunk.length;
+            }
+            res.complete(bytes);
+          },
           onError: (error) => throw Exception([requestUrl, error]),
         );
       });
