@@ -17,30 +17,39 @@ import 'write.pbenum.dart';
 
 export 'write.pbenum.dart';
 
-enum Write_Operation {
-  update, 
-  delete, 
-  transform, 
-  notSet
-}
+enum Write_Operation { update, delete, transform, notSet }
 
 class Write extends $pb.GeneratedMessage {
   static const $core.Map<$core.int, Write_Operation> _Write_OperationByTag = {
-    1 : Write_Operation.update,
-    2 : Write_Operation.delete,
-    6 : Write_Operation.transform,
-    0 : Write_Operation.notSet
+    1: Write_Operation.update,
+    2: Write_Operation.delete,
+    6: Write_Operation.transform,
+    0: Write_Operation.notSet
   };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Write', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'Write',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
     ..oo(0, [1, 2, 6])
-    ..aOM<$0.Document>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'update', subBuilder: $0.Document.create)
-    ..aOS(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'delete')
-    ..aOM<$1.DocumentMask>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateMask', subBuilder: $1.DocumentMask.create)
-    ..aOM<$1.Precondition>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentDocument', subBuilder: $1.Precondition.create)
+    ..aOM<$0.Document>(
+        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'update',
+        subBuilder: $0.Document.create)
+    ..aOS(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'delete')
+    ..aOM<$1.DocumentMask>(
+        3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateMask',
+        subBuilder: $1.DocumentMask.create)
+    ..aOM<$1.Precondition>(
+        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'currentDocument',
+        subBuilder: $1.Precondition.create)
     ..aOM<DocumentTransform>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'transform', subBuilder: DocumentTransform.create)
     ..pc<DocumentTransform_FieldTransform>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateTransforms', $pb.PbFieldType.PM, subBuilder: DocumentTransform_FieldTransform.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   Write._() : super();
   factory Write({
@@ -72,25 +81,30 @@ class Write extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory Write.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Write.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory Write.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory Write.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   Write clone() => Write()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  Write copyWith(void Function(Write) updates) => super.copyWith((message) => updates(message as Write)) as Write; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  Write copyWith(void Function(Write) updates) =>
+      super.copyWith((message) => updates(message as Write))
+          as Write; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static Write create() => Write._();
   Write createEmptyInstance() => create();
   static $pb.PbList<Write> createRepeated() => $pb.PbList<Write>();
   @$core.pragma('dart2js:noInline')
-  static Write getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Write>(create);
+  static Write getDefault() =>
+      _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Write>(create);
   static Write? _defaultInstance;
 
   Write_Operation whichOperation() => _Write_OperationByTag[$_whichOneof(0)]!;
@@ -99,7 +113,10 @@ class Write extends $pb.GeneratedMessage {
   @$pb.TagNumber(1)
   $0.Document get update => $_getN(0);
   @$pb.TagNumber(1)
-  set update($0.Document v) { setField(1, v); }
+  set update($0.Document v) {
+    setField(1, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasUpdate() => $_has(0);
   @$pb.TagNumber(1)
@@ -110,7 +127,10 @@ class Write extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.String get delete => $_getSZ(1);
   @$pb.TagNumber(2)
-  set delete($core.String v) { $_setString(1, v); }
+  set delete($core.String v) {
+    $_setString(1, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasDelete() => $_has(1);
   @$pb.TagNumber(2)
@@ -119,7 +139,10 @@ class Write extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $1.DocumentMask get updateMask => $_getN(2);
   @$pb.TagNumber(3)
-  set updateMask($1.DocumentMask v) { setField(3, v); }
+  set updateMask($1.DocumentMask v) {
+    setField(3, v);
+  }
+
   @$pb.TagNumber(3)
   $core.bool hasUpdateMask() => $_has(2);
   @$pb.TagNumber(3)
@@ -130,7 +153,10 @@ class Write extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $1.Precondition get currentDocument => $_getN(3);
   @$pb.TagNumber(4)
-  set currentDocument($1.Precondition v) { setField(4, v); }
+  set currentDocument($1.Precondition v) {
+    setField(4, v);
+  }
+
   @$pb.TagNumber(4)
   $core.bool hasCurrentDocument() => $_has(3);
   @$pb.TagNumber(4)
@@ -141,7 +167,10 @@ class Write extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   DocumentTransform get transform => $_getN(4);
   @$pb.TagNumber(6)
-  set transform(DocumentTransform v) { setField(6, v); }
+  set transform(DocumentTransform v) {
+    setField(6, v);
+  }
+
   @$pb.TagNumber(6)
   $core.bool hasTransform() => $_has(4);
   @$pb.TagNumber(6)
@@ -150,40 +179,63 @@ class Write extends $pb.GeneratedMessage {
   DocumentTransform ensureTransform() => $_ensure(4);
 
   @$pb.TagNumber(7)
-  $core.List<DocumentTransform_FieldTransform> get updateTransforms => $_getList(5);
+  $core.List<DocumentTransform_FieldTransform> get updateTransforms =>
+      $_getList(5);
 }
 
 enum DocumentTransform_FieldTransform_TransformType {
-  setToServerValue, 
-  increment, 
-  maximum, 
-  minimum, 
-  appendMissingElements, 
-  removeAllFromArray, 
+  setToServerValue,
+  increment,
+  maximum,
+  minimum,
+  appendMissingElements,
+  removeAllFromArray,
   notSet
 }
 
 class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
-  static const $core.Map<$core.int, DocumentTransform_FieldTransform_TransformType> _DocumentTransform_FieldTransform_TransformTypeByTag = {
-    2 : DocumentTransform_FieldTransform_TransformType.setToServerValue,
-    3 : DocumentTransform_FieldTransform_TransformType.increment,
-    4 : DocumentTransform_FieldTransform_TransformType.maximum,
-    5 : DocumentTransform_FieldTransform_TransformType.minimum,
-    6 : DocumentTransform_FieldTransform_TransformType.appendMissingElements,
-    7 : DocumentTransform_FieldTransform_TransformType.removeAllFromArray,
-    0 : DocumentTransform_FieldTransform_TransformType.notSet
+  static const $core
+          .Map<$core.int, DocumentTransform_FieldTransform_TransformType>
+      _DocumentTransform_FieldTransform_TransformTypeByTag = {
+    2: DocumentTransform_FieldTransform_TransformType.setToServerValue,
+    3: DocumentTransform_FieldTransform_TransformType.increment,
+    4: DocumentTransform_FieldTransform_TransformType.maximum,
+    5: DocumentTransform_FieldTransform_TransformType.minimum,
+    6: DocumentTransform_FieldTransform_TransformType.appendMissingElements,
+    7: DocumentTransform_FieldTransform_TransformType.removeAllFromArray,
+    0: DocumentTransform_FieldTransform_TransformType.notSet
   };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DocumentTransform.FieldTransform', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DocumentTransform.FieldTransform',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
     ..oo(0, [2, 3, 4, 5, 6, 7])
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fieldPath')
-    ..e<DocumentTransform_FieldTransform_ServerValue>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'setToServerValue', $pb.PbFieldType.OE, defaultOrMaker: DocumentTransform_FieldTransform_ServerValue.SERVER_VALUE_UNSPECIFIED, valueOf: DocumentTransform_FieldTransform_ServerValue.valueOf, enumValues: DocumentTransform_FieldTransform_ServerValue.values)
+    ..aOS(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'fieldPath')
+    ..e<DocumentTransform_FieldTransform_ServerValue>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'setToServerValue',
+        $pb.PbFieldType.OE,
+        defaultOrMaker:
+            DocumentTransform_FieldTransform_ServerValue.SERVER_VALUE_UNSPECIFIED,
+        valueOf: DocumentTransform_FieldTransform_ServerValue.valueOf,
+        enumValues: DocumentTransform_FieldTransform_ServerValue.values)
     ..aOM<$0.Value>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'increment', subBuilder: $0.Value.create)
     ..aOM<$0.Value>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'maximum', subBuilder: $0.Value.create)
     ..aOM<$0.Value>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'minimum', subBuilder: $0.Value.create)
     ..aOM<$0.ArrayValue>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'appendMissingElements', subBuilder: $0.ArrayValue.create)
     ..aOM<$0.ArrayValue>(7, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'removeAllFromArray', subBuilder: $0.ArrayValue.create)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   DocumentTransform_FieldTransform._() : super();
   factory DocumentTransform_FieldTransform({
@@ -219,43 +271,62 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DocumentTransform_FieldTransform.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DocumentTransform_FieldTransform.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
-  DocumentTransform_FieldTransform clone() => DocumentTransform_FieldTransform()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DocumentTransform_FieldTransform copyWith(void Function(DocumentTransform_FieldTransform) updates) => super.copyWith((message) => updates(message as DocumentTransform_FieldTransform)) as DocumentTransform_FieldTransform; // ignore: deprecated_member_use
+  factory DocumentTransform_FieldTransform.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DocumentTransform_FieldTransform.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
+  DocumentTransform_FieldTransform clone() =>
+      DocumentTransform_FieldTransform()..mergeFromMessage(this);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DocumentTransform_FieldTransform copyWith(
+          void Function(DocumentTransform_FieldTransform) updates) =>
+      super.copyWith(
+              (message) => updates(message as DocumentTransform_FieldTransform))
+          as DocumentTransform_FieldTransform; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
-  static DocumentTransform_FieldTransform create() => DocumentTransform_FieldTransform._();
+  static DocumentTransform_FieldTransform create() =>
+      DocumentTransform_FieldTransform._();
   DocumentTransform_FieldTransform createEmptyInstance() => create();
-  static $pb.PbList<DocumentTransform_FieldTransform> createRepeated() => $pb.PbList<DocumentTransform_FieldTransform>();
+  static $pb.PbList<DocumentTransform_FieldTransform> createRepeated() =>
+      $pb.PbList<DocumentTransform_FieldTransform>();
   @$core.pragma('dart2js:noInline')
-  static DocumentTransform_FieldTransform getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DocumentTransform_FieldTransform>(create);
+  static DocumentTransform_FieldTransform getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DocumentTransform_FieldTransform>(
+          create);
   static DocumentTransform_FieldTransform? _defaultInstance;
 
-  DocumentTransform_FieldTransform_TransformType whichTransformType() => _DocumentTransform_FieldTransform_TransformTypeByTag[$_whichOneof(0)]!;
+  DocumentTransform_FieldTransform_TransformType whichTransformType() =>
+      _DocumentTransform_FieldTransform_TransformTypeByTag[$_whichOneof(0)]!;
   void clearTransformType() => clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
   $core.String get fieldPath => $_getSZ(0);
   @$pb.TagNumber(1)
-  set fieldPath($core.String v) { $_setString(0, v); }
+  set fieldPath($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasFieldPath() => $_has(0);
   @$pb.TagNumber(1)
   void clearFieldPath() => clearField(1);
 
   @$pb.TagNumber(2)
-  DocumentTransform_FieldTransform_ServerValue get setToServerValue => $_getN(1);
+  DocumentTransform_FieldTransform_ServerValue get setToServerValue =>
+      $_getN(1);
   @$pb.TagNumber(2)
-  set setToServerValue(DocumentTransform_FieldTransform_ServerValue v) { setField(2, v); }
+  set setToServerValue(DocumentTransform_FieldTransform_ServerValue v) {
+    setField(2, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasSetToServerValue() => $_has(1);
   @$pb.TagNumber(2)
@@ -264,7 +335,10 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
   @$pb.TagNumber(3)
   $0.Value get increment => $_getN(2);
   @$pb.TagNumber(3)
-  set increment($0.Value v) { setField(3, v); }
+  set increment($0.Value v) {
+    setField(3, v);
+  }
+
   @$pb.TagNumber(3)
   $core.bool hasIncrement() => $_has(2);
   @$pb.TagNumber(3)
@@ -275,7 +349,10 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $0.Value get maximum => $_getN(3);
   @$pb.TagNumber(4)
-  set maximum($0.Value v) { setField(4, v); }
+  set maximum($0.Value v) {
+    setField(4, v);
+  }
+
   @$pb.TagNumber(4)
   $core.bool hasMaximum() => $_has(3);
   @$pb.TagNumber(4)
@@ -286,7 +363,10 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
   @$pb.TagNumber(5)
   $0.Value get minimum => $_getN(4);
   @$pb.TagNumber(5)
-  set minimum($0.Value v) { setField(5, v); }
+  set minimum($0.Value v) {
+    setField(5, v);
+  }
+
   @$pb.TagNumber(5)
   $core.bool hasMinimum() => $_has(4);
   @$pb.TagNumber(5)
@@ -297,7 +377,10 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
   @$pb.TagNumber(6)
   $0.ArrayValue get appendMissingElements => $_getN(5);
   @$pb.TagNumber(6)
-  set appendMissingElements($0.ArrayValue v) { setField(6, v); }
+  set appendMissingElements($0.ArrayValue v) {
+    setField(6, v);
+  }
+
   @$pb.TagNumber(6)
   $core.bool hasAppendMissingElements() => $_has(5);
   @$pb.TagNumber(6)
@@ -308,7 +391,10 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
   @$pb.TagNumber(7)
   $0.ArrayValue get removeAllFromArray => $_getN(6);
   @$pb.TagNumber(7)
-  set removeAllFromArray($0.ArrayValue v) { setField(7, v); }
+  set removeAllFromArray($0.ArrayValue v) {
+    setField(7, v);
+  }
+
   @$pb.TagNumber(7)
   $core.bool hasRemoveAllFromArray() => $_has(6);
   @$pb.TagNumber(7)
@@ -318,11 +404,28 @@ class DocumentTransform_FieldTransform extends $pb.GeneratedMessage {
 }
 
 class DocumentTransform extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DocumentTransform', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'document')
-    ..pc<DocumentTransform_FieldTransform>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'fieldTransforms', $pb.PbFieldType.PM, subBuilder: DocumentTransform_FieldTransform.create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DocumentTransform',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..aOS(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'document')
+    ..pc<DocumentTransform_FieldTransform>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'fieldTransforms',
+        $pb.PbFieldType.PM,
+        subBuilder: DocumentTransform_FieldTransform.create)
+    ..hasRequiredFields = false;
 
   DocumentTransform._() : super();
   factory DocumentTransform({
@@ -338,46 +441,71 @@ class DocumentTransform extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DocumentTransform.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DocumentTransform.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory DocumentTransform.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DocumentTransform.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   DocumentTransform clone() => DocumentTransform()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DocumentTransform copyWith(void Function(DocumentTransform) updates) => super.copyWith((message) => updates(message as DocumentTransform)) as DocumentTransform; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DocumentTransform copyWith(void Function(DocumentTransform) updates) =>
+      super.copyWith((message) => updates(message as DocumentTransform))
+          as DocumentTransform; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DocumentTransform create() => DocumentTransform._();
   DocumentTransform createEmptyInstance() => create();
-  static $pb.PbList<DocumentTransform> createRepeated() => $pb.PbList<DocumentTransform>();
+  static $pb.PbList<DocumentTransform> createRepeated() =>
+      $pb.PbList<DocumentTransform>();
   @$core.pragma('dart2js:noInline')
-  static DocumentTransform getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DocumentTransform>(create);
+  static DocumentTransform getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DocumentTransform>(create);
   static DocumentTransform? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get document => $_getSZ(0);
   @$pb.TagNumber(1)
-  set document($core.String v) { $_setString(0, v); }
+  set document($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasDocument() => $_has(0);
   @$pb.TagNumber(1)
   void clearDocument() => clearField(1);
 
   @$pb.TagNumber(2)
-  $core.List<DocumentTransform_FieldTransform> get fieldTransforms => $_getList(1);
+  $core.List<DocumentTransform_FieldTransform> get fieldTransforms =>
+      $_getList(1);
 }
 
 class WriteResult extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'WriteResult', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..aOM<$2.Timestamp>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateTime', subBuilder: $2.Timestamp.create)
-    ..pc<$0.Value>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'transformResults', $pb.PbFieldType.PM, subBuilder: $0.Value.create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'WriteResult',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..aOM<$2.Timestamp>(
+        1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'updateTime',
+        subBuilder: $2.Timestamp.create)
+    ..pc<$0.Value>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'transformResults',
+        $pb.PbFieldType.PM,
+        subBuilder: $0.Value.create)
+    ..hasRequiredFields = false;
 
   WriteResult._() : super();
   factory WriteResult({
@@ -393,31 +521,39 @@ class WriteResult extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory WriteResult.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory WriteResult.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory WriteResult.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory WriteResult.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   WriteResult clone() => WriteResult()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  WriteResult copyWith(void Function(WriteResult) updates) => super.copyWith((message) => updates(message as WriteResult)) as WriteResult; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  WriteResult copyWith(void Function(WriteResult) updates) =>
+      super.copyWith((message) => updates(message as WriteResult))
+          as WriteResult; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static WriteResult create() => WriteResult._();
   WriteResult createEmptyInstance() => create();
   static $pb.PbList<WriteResult> createRepeated() => $pb.PbList<WriteResult>();
   @$core.pragma('dart2js:noInline')
-  static WriteResult getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<WriteResult>(create);
+  static WriteResult getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<WriteResult>(create);
   static WriteResult? _defaultInstance;
 
   @$pb.TagNumber(1)
   $2.Timestamp get updateTime => $_getN(0);
   @$pb.TagNumber(1)
-  set updateTime($2.Timestamp v) { setField(1, v); }
+  set updateTime($2.Timestamp v) {
+    setField(1, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasUpdateTime() => $_has(0);
   @$pb.TagNumber(1)
@@ -430,12 +566,26 @@ class WriteResult extends $pb.GeneratedMessage {
 }
 
 class DocumentChange extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DocumentChange', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..aOM<$0.Document>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'document', subBuilder: $0.Document.create)
-    ..p<$core.int>(5, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'targetIds', $pb.PbFieldType.P3)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DocumentChange',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..aOM<$0.Document>(1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'document',
+        subBuilder: $0.Document.create)
+    ..p<$core.int>(
+        5,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'targetIds',
+        $pb.PbFieldType.P3)
     ..p<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'removedTargetIds', $pb.PbFieldType.P3)
-    ..hasRequiredFields = false
-  ;
+    ..hasRequiredFields = false;
 
   DocumentChange._() : super();
   factory DocumentChange({
@@ -455,31 +605,40 @@ class DocumentChange extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DocumentChange.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DocumentChange.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory DocumentChange.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DocumentChange.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   DocumentChange clone() => DocumentChange()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DocumentChange copyWith(void Function(DocumentChange) updates) => super.copyWith((message) => updates(message as DocumentChange)) as DocumentChange; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DocumentChange copyWith(void Function(DocumentChange) updates) =>
+      super.copyWith((message) => updates(message as DocumentChange))
+          as DocumentChange; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DocumentChange create() => DocumentChange._();
   DocumentChange createEmptyInstance() => create();
-  static $pb.PbList<DocumentChange> createRepeated() => $pb.PbList<DocumentChange>();
+  static $pb.PbList<DocumentChange> createRepeated() =>
+      $pb.PbList<DocumentChange>();
   @$core.pragma('dart2js:noInline')
-  static DocumentChange getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DocumentChange>(create);
+  static DocumentChange getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DocumentChange>(create);
   static DocumentChange? _defaultInstance;
 
   @$pb.TagNumber(1)
   $0.Document get document => $_getN(0);
   @$pb.TagNumber(1)
-  set document($0.Document v) { setField(1, v); }
+  set document($0.Document v) {
+    setField(1, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasDocument() => $_has(0);
   @$pb.TagNumber(1)
@@ -495,12 +654,30 @@ class DocumentChange extends $pb.GeneratedMessage {
 }
 
 class DocumentDelete extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DocumentDelete', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'document')
-    ..aOM<$2.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'readTime', subBuilder: $2.Timestamp.create)
-    ..p<$core.int>(6, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'removedTargetIds', $pb.PbFieldType.P3)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DocumentDelete',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..aOS(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'document')
+    ..aOM<$2.Timestamp>(
+        4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'readTime',
+        subBuilder: $2.Timestamp.create)
+    ..p<$core.int>(
+        6,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'removedTargetIds',
+        $pb.PbFieldType.P3)
+    ..hasRequiredFields = false;
 
   DocumentDelete._() : super();
   factory DocumentDelete({
@@ -520,31 +697,40 @@ class DocumentDelete extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DocumentDelete.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DocumentDelete.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory DocumentDelete.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DocumentDelete.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   DocumentDelete clone() => DocumentDelete()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DocumentDelete copyWith(void Function(DocumentDelete) updates) => super.copyWith((message) => updates(message as DocumentDelete)) as DocumentDelete; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DocumentDelete copyWith(void Function(DocumentDelete) updates) =>
+      super.copyWith((message) => updates(message as DocumentDelete))
+          as DocumentDelete; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DocumentDelete create() => DocumentDelete._();
   DocumentDelete createEmptyInstance() => create();
-  static $pb.PbList<DocumentDelete> createRepeated() => $pb.PbList<DocumentDelete>();
+  static $pb.PbList<DocumentDelete> createRepeated() =>
+      $pb.PbList<DocumentDelete>();
   @$core.pragma('dart2js:noInline')
-  static DocumentDelete getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DocumentDelete>(create);
+  static DocumentDelete getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DocumentDelete>(create);
   static DocumentDelete? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get document => $_getSZ(0);
   @$pb.TagNumber(1)
-  set document($core.String v) { $_setString(0, v); }
+  set document($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasDocument() => $_has(0);
   @$pb.TagNumber(1)
@@ -553,7 +739,10 @@ class DocumentDelete extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $2.Timestamp get readTime => $_getN(1);
   @$pb.TagNumber(4)
-  set readTime($2.Timestamp v) { setField(4, v); }
+  set readTime($2.Timestamp v) {
+    setField(4, v);
+  }
+
   @$pb.TagNumber(4)
   $core.bool hasReadTime() => $_has(1);
   @$pb.TagNumber(4)
@@ -566,12 +755,30 @@ class DocumentDelete extends $pb.GeneratedMessage {
 }
 
 class DocumentRemove extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'DocumentRemove', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..aOS(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'document')
-    ..p<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'removedTargetIds', $pb.PbFieldType.P3)
-    ..aOM<$2.Timestamp>(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'readTime', subBuilder: $2.Timestamp.create)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'DocumentRemove',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..aOS(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'document')
+    ..p<$core.int>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'removedTargetIds',
+        $pb.PbFieldType.P3)
+    ..aOM<$2.Timestamp>(4,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'readTime',
+        subBuilder: $2.Timestamp.create)
+    ..hasRequiredFields = false;
 
   DocumentRemove._() : super();
   factory DocumentRemove({
@@ -591,31 +798,40 @@ class DocumentRemove extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory DocumentRemove.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory DocumentRemove.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory DocumentRemove.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory DocumentRemove.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   DocumentRemove clone() => DocumentRemove()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  DocumentRemove copyWith(void Function(DocumentRemove) updates) => super.copyWith((message) => updates(message as DocumentRemove)) as DocumentRemove; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  DocumentRemove copyWith(void Function(DocumentRemove) updates) =>
+      super.copyWith((message) => updates(message as DocumentRemove))
+          as DocumentRemove; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static DocumentRemove create() => DocumentRemove._();
   DocumentRemove createEmptyInstance() => create();
-  static $pb.PbList<DocumentRemove> createRepeated() => $pb.PbList<DocumentRemove>();
+  static $pb.PbList<DocumentRemove> createRepeated() =>
+      $pb.PbList<DocumentRemove>();
   @$core.pragma('dart2js:noInline')
-  static DocumentRemove getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<DocumentRemove>(create);
+  static DocumentRemove getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<DocumentRemove>(create);
   static DocumentRemove? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get document => $_getSZ(0);
   @$pb.TagNumber(1)
-  set document($core.String v) { $_setString(0, v); }
+  set document($core.String v) {
+    $_setString(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasDocument() => $_has(0);
   @$pb.TagNumber(1)
@@ -627,7 +843,10 @@ class DocumentRemove extends $pb.GeneratedMessage {
   @$pb.TagNumber(4)
   $2.Timestamp get readTime => $_getN(2);
   @$pb.TagNumber(4)
-  set readTime($2.Timestamp v) { setField(4, v); }
+  set readTime($2.Timestamp v) {
+    setField(4, v);
+  }
+
   @$pb.TagNumber(4)
   $core.bool hasReadTime() => $_has(2);
   @$pb.TagNumber(4)
@@ -637,11 +856,28 @@ class DocumentRemove extends $pb.GeneratedMessage {
 }
 
 class ExistenceFilter extends $pb.GeneratedMessage {
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'ExistenceFilter', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'google.firestore.v1'), createEmptyInstance: create)
-    ..a<$core.int>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'targetId', $pb.PbFieldType.O3)
-    ..a<$core.int>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'count', $pb.PbFieldType.O3)
-    ..hasRequiredFields = false
-  ;
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(
+      const $core.bool.fromEnvironment('protobuf.omit_message_names')
+          ? ''
+          : 'ExistenceFilter',
+      package: const $pb.PackageName(
+          const $core.bool.fromEnvironment('protobuf.omit_message_names')
+              ? ''
+              : 'google.firestore.v1'),
+      createEmptyInstance: create)
+    ..a<$core.int>(
+        1,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'targetId',
+        $pb.PbFieldType.O3)
+    ..a<$core.int>(
+        2,
+        const $core.bool.fromEnvironment('protobuf.omit_field_names')
+            ? ''
+            : 'count',
+        $pb.PbFieldType.O3)
+    ..hasRequiredFields = false;
 
   ExistenceFilter._() : super();
   factory ExistenceFilter({
@@ -657,31 +893,40 @@ class ExistenceFilter extends $pb.GeneratedMessage {
     }
     return _result;
   }
-  factory ExistenceFilter.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ExistenceFilter.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
-  'Will be removed in next major version')
+  factory ExistenceFilter.fromBuffer($core.List<$core.int> i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromBuffer(i, r);
+  factory ExistenceFilter.fromJson($core.String i,
+          [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) =>
+      create()..mergeFromJson(i, r);
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+      'Will be removed in next major version')
   ExistenceFilter clone() => ExistenceFilter()..mergeFromMessage(this);
-  @$core.Deprecated(
-  'Using this can add significant overhead to your binary. '
-  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
-  'Will be removed in next major version')
-  ExistenceFilter copyWith(void Function(ExistenceFilter) updates) => super.copyWith((message) => updates(message as ExistenceFilter)) as ExistenceFilter; // ignore: deprecated_member_use
+  @$core.Deprecated('Using this can add significant overhead to your binary. '
+      'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+      'Will be removed in next major version')
+  ExistenceFilter copyWith(void Function(ExistenceFilter) updates) =>
+      super.copyWith((message) => updates(message as ExistenceFilter))
+          as ExistenceFilter; // ignore: deprecated_member_use
   $pb.BuilderInfo get info_ => _i;
   @$core.pragma('dart2js:noInline')
   static ExistenceFilter create() => ExistenceFilter._();
   ExistenceFilter createEmptyInstance() => create();
-  static $pb.PbList<ExistenceFilter> createRepeated() => $pb.PbList<ExistenceFilter>();
+  static $pb.PbList<ExistenceFilter> createRepeated() =>
+      $pb.PbList<ExistenceFilter>();
   @$core.pragma('dart2js:noInline')
-  static ExistenceFilter getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ExistenceFilter>(create);
+  static ExistenceFilter getDefault() => _defaultInstance ??=
+      $pb.GeneratedMessage.$_defaultFor<ExistenceFilter>(create);
   static ExistenceFilter? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.int get targetId => $_getIZ(0);
   @$pb.TagNumber(1)
-  set targetId($core.int v) { $_setSignedInt32(0, v); }
+  set targetId($core.int v) {
+    $_setSignedInt32(0, v);
+  }
+
   @$pb.TagNumber(1)
   $core.bool hasTargetId() => $_has(0);
   @$pb.TagNumber(1)
@@ -690,10 +935,12 @@ class ExistenceFilter extends $pb.GeneratedMessage {
   @$pb.TagNumber(2)
   $core.int get count => $_getIZ(1);
   @$pb.TagNumber(2)
-  set count($core.int v) { $_setSignedInt32(1, v); }
+  set count($core.int v) {
+    $_setSignedInt32(1, v);
+  }
+
   @$pb.TagNumber(2)
   $core.bool hasCount() => $_has(1);
   @$pb.TagNumber(2)
   void clearCount() => clearField(2);
 }
-

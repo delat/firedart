@@ -204,7 +204,7 @@ class FirestoreGateway {
   void _setupClient() {
     _listenRequestStreamMap.clear();
     _client = FirestoreClient(ClientChannel('firestore.googleapis.com'),
-        options: TokenAuthenticator.from(auth)?.toCallOptions);
+        options: TokenAuthenticator.from(auth!).toCallOptions);
   }
 
   void _handleError(e) {

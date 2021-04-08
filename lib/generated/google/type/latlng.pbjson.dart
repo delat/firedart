@@ -8,6 +8,7 @@
 import 'dart:core' as $core;
 import 'dart:convert' as $convert;
 import 'dart:typed_data' as $typed_data;
+
 @$core.Deprecated('Use latLngDescriptor instead')
 const LatLng$json = const {
   '1': 'LatLng',
@@ -18,4 +19,5 @@ const LatLng$json = const {
 };
 
 /// Descriptor for `LatLng`. Decode as a `google.protobuf.DescriptorProto`.
-final $typed_data.Uint8List latLngDescriptor = $convert.base64Decode('CgZMYXRMbmcSGgoIbGF0aXR1ZGUYASABKAFSCGxhdGl0dWRlEhwKCWxvbmdpdHVkZRgCIAEoAVIJbG9uZ2l0dWRl');
+final $typed_data.Uint8List latLngDescriptor = $convert.base64Decode(
+    'CgZMYXRMbmcSGgoIbGF0aXR1ZGUYASABKAFSCGxhdGl0dWRlEhwKCWxvbmdpdHVkZRgCIAEoAVIJbG9uZ2l0dWRl');
