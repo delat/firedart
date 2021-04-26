@@ -7,7 +7,7 @@ import 'package:firedart/auth/token_provider.dart';
 class UserGateway {
   final UserClient _client;
 
-  UserGateway(KeyClient client, TokenProvider? tokenProvider)
+  UserGateway(KeyClient client, TokenProvider tokenProvider)
       : _client = UserClient(client, tokenProvider);
 
   Future<void> requestEmailVerification() =>
@@ -50,18 +50,37 @@ class UserGateway {
 }
 
 class User {
-  final String? id;
-  final String? displayName;
-  final String? photoUrl;
-  final String? email;
-  final bool? emailVerified;
+  final String id;
+  final String displayName;
+  final String photoUrl;
+  final String email;
+  final bool emailVerified;
 
-  User.fromMap(Map<String, dynamic> map)
-      : id = map['localId'],
-        displayName = map['displayName'],
-        photoUrl = map['photoUrl'],
-        email = map['email'],
-        emailVerified = map['emailVerified'];
+  User._({
+    required this.id,
+    required this.displayName,
+    required this.photoUrl,
+    required this.email,
+    required this.emailVerified,
+  });
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    if (map['localId'] is! String ||
+        map['displayName'] is! String ||
+        map['photoUrl'] is! String ||
+        map['email'] is! String ||
+        map['emailVerified'] is! bool) {
+      throw Exception('Wrong user data format');
+    }
+
+    return User._(
+      id: map['localId'],
+      displayName: map['displayName'],
+      photoUrl: map['photoUrl'],
+      email: map['email'],
+      emailVerified: map['emailVerified'],
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         'localId': id,

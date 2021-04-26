@@ -16,40 +16,41 @@ import 'service_account.dart';
 class FirebaseAuth {
   /* Singleton interface */
   static FirebaseAuth? _instance;
-
-  static FirebaseAuth? initialize(String apiKey, TokenStore tokenStore,
-      {ServiceAccount? serviceAccount}) {
-    if (_instance != null) {
-      throw Exception('FirebaseAuth instance was already initialized');
-    }
-    _instance =
-        FirebaseAuth(apiKey, tokenStore, serviceAccount: serviceAccount);
-    return _instance;
-  }
-
-  static FirebaseAuth? get instance {
+  static FirebaseAuth get instance {
     if (_instance == null) {
       throw Exception(
           "FirebaseAuth hasn't been initialized. Please call FirebaseAuth.initialize() before using it.");
     }
-    return _instance;
+    return _instance!;
   }
 
   /* Instance interface */
   final String apiKey;
   final ServiceAccount? serviceAccount;
 
-  http.Client? httpClient;
-  TokenProvider? tokenProvider;
+  late http.Client httpClient;
+  late TokenProvider tokenProvider;
 
   late AuthGateway _authGateway;
   late UserGateway _userGateway;
 
-  FirebaseAuth(this.apiKey, TokenStore tokenStore,
-      {this.httpClient, this.serviceAccount})
-      : assert(apiKey.isNotEmpty),
-        assert(tokenStore != null) {
-    httpClient ??= http.Client();
+  factory FirebaseAuth(String apiKey, TokenStore tokenStore,
+      {ServiceAccount? serviceAccount}) {
+    if (_instance != null) {
+      throw Exception('FirebaseAuth instance was already initialized');
+    }
+    _instance =
+        FirebaseAuth._(apiKey, tokenStore, serviceAccount: serviceAccount);
+    return _instance!;
+  }
+
+  FirebaseAuth._(
+    this.apiKey,
+    TokenStore tokenStore, {
+    http.Client? client,
+    this.serviceAccount,
+  }) {
+    httpClient = client ?? http.Client();
     var keyClient = KeyClient(httpClient, apiKey);
     tokenProvider = TokenProvider(keyClient, tokenStore);
 
@@ -57,11 +58,11 @@ class FirebaseAuth {
     _userGateway = UserGateway(keyClient, tokenProvider);
   }
 
-  bool get isSignedIn => tokenProvider!.isSignedIn;
+  bool get isSignedIn => tokenProvider.isSignedIn;
 
-  ValueStream<bool> get signInState => tokenProvider!.signInState;
+  ValueStream<bool> get signInState => tokenProvider.signInState;
 
-  String? get userId => tokenProvider!.userId;
+  String? get userId => tokenProvider.userId;
 
   Future<User> signUp(String email, String password) =>
       _authGateway.signUp(email, password);
@@ -69,7 +70,7 @@ class FirebaseAuth {
   Future<User> signIn(String email, String password) =>
       _authGateway.signIn(email, password);
 
-  void signOut() => tokenProvider!.signOut();
+  void signOut() => tokenProvider.signOut();
 
   Future<void> resetPassword(String email) => _authGateway.resetPassword(email);
 

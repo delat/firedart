@@ -27,7 +27,7 @@ class TokenProvider {
 
   ValueStream<bool> get signInState => _signInStateSubject.stream;
 
-  Future<String?> get idToken async {
+  Future<String> get idToken async {
     if (!isSignedIn) throw SignedOutException();
 
     if (_tokenStore.expiry
@@ -39,12 +39,20 @@ class TokenProvider {
   }
 
   Future<void> setToken(Map<String, dynamic> map) async {
+    if (map['localId'] is! String ||
+        map['idToken'] is! String ||
+        map['refreshToken'] is! String ||
+        map['expiresIn'] is! String) {
+      throw Exception('Wrong token format');
+    }
+
     await _tokenStore.setToken(
       map['localId'],
       map['idToken'],
       map['refreshToken'],
       int.parse(map['expiresIn']),
     );
+
     _notifyState();
   }
 
@@ -75,7 +83,6 @@ class TokenProvider {
       case 400:
         signOut();
         throw AuthException(response.body);
-        break;
     }
   }
 

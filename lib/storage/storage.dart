@@ -12,34 +12,42 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 
 class StorageBucketListItem {
-  FirebaseStorage? storage;
-  String? name;
-  String? bucket;
+  FirebaseStorage storage;
+  String name;
+  String bucket;
 
-  StorageBucketListItem({this.name, this.bucket, this.storage});
+  StorageBucketListItem({
+    required this.name,
+    required this.bucket,
+    required this.storage,
+  });
 
   factory StorageBucketListItem.fromMap(
-          FirebaseStorage? storage, Map<String, dynamic> map) =>
-      StorageBucketListItem(
-          name: map['name'], bucket: map['bucket'], storage: storage);
-
-  String getFilename() {
-    if ((name == null || name!.isEmpty)) return '';
-    var i = name!.lastIndexOf('/');
-    return name!.substring(i + 1);
+      FirebaseStorage storage, Map<String, dynamic> map) {
+    if (map['name'] is! String || map['bucket']! is String) {
+      throw Exception('Name and bucket ust be provided!');
+    }
+    return StorageBucketListItem(
+        name: map['name'], bucket: map['bucket'], storage: storage);
   }
 
-  String? getDirectory() {
-    if (name == null || name!.isEmpty) return '';
-    var i = name!.lastIndexOf('/');
-    return i == -1 ? name : name!.substring(0, i);
+  String getFilename() {
+    if (name.isEmpty) return '';
+    var i = name.lastIndexOf('/');
+    return name.substring(i + 1);
+  }
+
+  String getDirectory() {
+    if (name.isEmpty) return '';
+    var i = name.lastIndexOf('/');
+    return i == -1 ? name : name.substring(0, i);
   }
 
   FirebaseStorageReference getReference() =>
       FirebaseStorageReference(storage, name);
 
   @override
-  String toString() => name!;
+  String toString() => name;
 }
 
 class StorageBucketList {
@@ -47,10 +55,14 @@ class StorageBucketList {
   List<String>? prefixes = [];
   String? nextPageToken;
   StorageBucketList.fromMap({
-    FirebaseStorage? storage,
+    required FirebaseStorage storage,
     required Map<String, dynamic> map,
   }) {
-    prefixes = map['prefixes'].cast<String>();
+    if (map['items'] is! List) {
+      throw ArgumentError('Map must contain bucket items!');
+    }
+
+    prefixes = map['prefixes']?.cast<String>();
     nextPageToken = map['nextPagetoken'];
     for (var item in map['items']) {
       items.add(StorageBucketListItem.fromMap(storage, item));
@@ -60,7 +72,7 @@ class StorageBucketList {
 
 class FirebaseStorage {
   final String storageBucket;
-  final FirebaseAuth? auth = FirebaseAuth.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
   FirebaseStorage.instanceFor(this.storageBucket);
 
@@ -73,7 +85,7 @@ class FirebaseStorageReference {
   static final String _firebaseStorageEndpoint =
       'https://firebasestorage.googleapis.com/v0/b/';
 
-  final FirebaseStorage? storage;
+  final FirebaseStorage storage;
   late Pointer _pointer;
 
   FirebaseStorageReference(this.storage, String? childRoot) {
@@ -96,8 +108,8 @@ class FirebaseStorageReference {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] =
@@ -135,8 +147,8 @@ class FirebaseStorageReference {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var data = await file.readAsBytes();
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
@@ -175,8 +187,8 @@ class FirebaseStorageReference {
     var requestUrl = _getTargetUrl();
     var res = Completer();
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var request = Request('POST', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
@@ -212,11 +224,11 @@ class FirebaseStorageReference {
     var requestUrl = await getDownloadUrl();
     var res = Completer<Uint8List>();
     try {
-      var http = storage!.auth!.httpClient;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var request = Request('GET', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      var response = http!.send(request);
+      var response = http.send(request);
 
       var chunks = <List<int>>[];
       var downloaded = 0;
@@ -263,8 +275,8 @@ class FirebaseStorageReference {
         await file.create();
       }
 
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var request = Request('GET', Uri.parse(requestUrl));
       request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
       var response = http.send(request);
@@ -325,8 +337,8 @@ class FirebaseStorageReference {
     var requestUrl = _getDownloadUrl();
     var resultContent = 'N/A';
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var result = await http.delete(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
       resultContent = result.body;
@@ -341,11 +353,11 @@ class FirebaseStorageReference {
   }
 
   String _getTargetUrl() {
-    return '${_firebaseStorageEndpoint}${storage!.storageBucket}/o?name=${_getEscapedPath()}';
+    return '$_firebaseStorageEndpoint${storage.storageBucket}/o?name=${_getEscapedPath()}';
   }
 
   String _getDownloadUrl() {
-    return '${_firebaseStorageEndpoint}${storage!.storageBucket}/o/${_getEscapedPath()}';
+    return '$_firebaseStorageEndpoint${storage.storageBucket}/o/${_getEscapedPath()}';
   }
 
   String _getFullDownloadUrl() {
@@ -366,7 +378,7 @@ class FirebaseStorageReference {
     }
 
     String reqUrl;
-    reqUrl = '${_firebaseStorageEndpoint}${storage!.storageBucket}/o/?';
+    reqUrl = '$_firebaseStorageEndpoint${storage.storageBucket}/o/?';
     reqUrl +=
         'prefix=${_pointer.isRoot ? '' : _pointer.path + Uri.encodeComponent("/")}';
 
@@ -380,11 +392,11 @@ class FirebaseStorageReference {
     return reqUrl;
   }
 
-  Future<Map<String, dynamic>?> _performFetch() async {
+  Future<Map<String, dynamic>> _performFetch() async {
     var requestUrl = _getDownloadUrl();
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var result = await http.read(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
 
@@ -396,8 +408,8 @@ class FirebaseStorageReference {
 
   Future<StorageBucketList> _internalRequest(String fullUrl) async {
     try {
-      var http = storage!.auth!.httpClient!;
-      var token = await storage!.auth!.tokenProvider!.idToken;
+      var http = storage.auth.httpClient;
+      var token = await storage.auth.tokenProvider.idToken;
       var result = await http.get(Uri.parse(fullUrl),
           headers: {'Authorization': 'Firebase $token'});
 

@@ -8,7 +8,7 @@ import 'test_config.dart';
 Future main() async {
   var tokenStore = VolatileStore();
   var auth = FirebaseAuth(apiKey, tokenStore);
-  var firestore = Firestore(projectId, auth: auth);
+  var firestore = Firestore(projectId);
   await auth.signIn(email, password);
 
   test('Create reference', () async {

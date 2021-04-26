@@ -8,10 +8,9 @@ const email = 'you@server.com';
 const password = '1234';
 
 Future main() async {
-  FirebaseAuth.initialize(apiKey, VolatileStore());
-  Firestore.initialize(projectId); // Firestore reuses the auth client
+  final auth = FirebaseAuth(apiKey, VolatileStore());
+  final firestore = Firestore(projectId); // Firestore reuses the auth client
 
-  var auth = FirebaseAuth.instance!;
   // Monitor sign-in state
   auth.signInState.listen((state) => print("Signed ${state ? "in" : "out"}"));
 
@@ -23,7 +22,7 @@ Future main() async {
   print(user);
 
   // Instantiate a reference to a document - this happens offline
-  var ref = Firestore.instance!.collection('test').document('doc');
+  var ref = firestore.collection('test').document('doc');
 
   // Subscribe to changes to that document
   ref.stream.listen((document) => print('updated: $document'));

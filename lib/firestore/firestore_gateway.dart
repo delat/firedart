@@ -13,26 +13,26 @@ import 'models.dart';
 
 class _FirestoreGatewayStreamCache {
   void Function(String? userInfo)? onDone;
-  String? userInfo;
   void Function(Object e)? onError;
+  String? userInfo;
 
-  PublishSubject<ListenRequest>? _listenRequestSubject;
+  late PublishSubject<ListenRequest> _listenRequestSubject;
   late PublishSubject<ListenResponse> _listenResponseSubject;
-  Map<String, Document>? _documentMap;
+  late Map<String, Document> _documentMap;
 
   late bool _shouldCleanup;
 
   Stream<ListenResponse> get stream => _listenResponseSubject.stream;
   Map<String, Document>? get documentMap => _documentMap;
 
-  _FirestoreGatewayStreamCache({this.onDone, this.userInfo, this.onError}) {
+  _FirestoreGatewayStreamCache({this.userInfo, this.onDone, this.onError}) {
     onError ??= _handleErrorStub;
   }
 
   void setListenRequest(
       ListenRequest request, FirestoreClient client, String database) {
     // Close the request stream if this function is called for a second time;
-    _listenRequestSubject?.close();
+    _listenRequestSubject.close();
 
     _documentMap = <String, Document>{};
     _listenRequestSubject = PublishSubject<ListenRequest>();
@@ -41,11 +41,11 @@ class _FirestoreGatewayStreamCache {
       onCancel: _handleCancelOnResponseStream,
     );
     _listenResponseSubject.addStream(client
-        .listen(_listenRequestSubject!.stream,
+        .listen(_listenRequestSubject.stream,
             options: CallOptions(
                 metadata: {'google-cloud-resource-prefix': database}))
         .handleError(onError!));
-    _listenRequestSubject!.add(request);
+    _listenRequestSubject.add(request);
   }
 
   void _handleListenOnResponseStream() {

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:firedart/auth/token_provider.dart';
 import 'package:http/http.dart' as http;
@@ -13,15 +12,8 @@ class VerboseClient extends http.BaseClient {
 
   @override
   Future<http.StreamedResponse> send(http.BaseRequest request) async {
-    print('--> ${request.method} ${request.url}');
-    print(request.headers);
-    print((request as http.Request).body);
-
     var response = await _client.send(request);
-    print(
-        '<-- ${response.statusCode} ${response.reasonPhrase} ${response.request!.url}');
     var loggedStream = response.stream.map((event) {
-      print(utf8.decode(event));
       return event;
     });
 
@@ -39,7 +31,7 @@ class VerboseClient extends http.BaseClient {
 }
 
 class KeyClient extends http.BaseClient {
-  final http.Client? client;
+  final http.Client client;
   final String apiKey;
 
   KeyClient(this.client, this.apiKey);
@@ -54,13 +46,13 @@ class KeyClient extends http.BaseClient {
         ..headers.addAll(request.headers)
         ..bodyBytes = (request as http.Request).bodyBytes;
     }
-    return client!.send(request);
+    return client.send(request);
   }
 }
 
 class UserClient extends http.BaseClient {
   final KeyClient client;
-  final TokenProvider? tokenProvider;
+  final TokenProvider tokenProvider;
 
   UserClient(this.client, this.tokenProvider);
 
@@ -69,10 +61,7 @@ class UserClient extends http.BaseClient {
     var body = (request as http.Request).bodyFields;
     request = http.Request(request.method, request.url)
       ..headers['content-type'] = 'application/x-www-form-urlencoded'
-      ..bodyFields = {
-        ...body,
-        'idToken': await (tokenProvider!.idToken as FutureOr<String>)
-      };
+      ..bodyFields = {...body, 'idToken': await (tokenProvider.idToken)};
     return client.send(request);
   }
 }

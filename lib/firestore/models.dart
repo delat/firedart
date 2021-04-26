@@ -252,8 +252,8 @@ class QueryReference extends Reference {
   final StructuredQuery _structuredQuery = StructuredQuery();
 
   QueryReference(FirestoreGateway gateway, String path) : super(gateway, path) {
-    _structuredQuery
-      ..from.add(StructuredQuery_CollectionSelector()..collectionId = id);
+    _structuredQuery.from
+        .add(StructuredQuery_CollectionSelector()..collectionId = id);
   }
 
   QueryReference where(
@@ -300,6 +300,7 @@ class QueryReference extends Reference {
       _addFilter(fieldPath, whereIn,
           operator: StructuredQuery_FieldFilter_Operator.IN);
     }
+
     if (isNull) {
       _addFilter(fieldPath, null);
     }
