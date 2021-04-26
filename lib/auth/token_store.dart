@@ -53,7 +53,7 @@ abstract class TokenStore {
   }
 
   /// Restore the refresh token from storage, returns null if token isn't stored
-  Future<Token> read();
+  Future<Token?> read();
 
   /// Persist the refresh token
   Future<void> write(Token token);
@@ -65,7 +65,7 @@ abstract class TokenStore {
 /// persistence isn't available but it's fine signing in for each session.
 class VolatileStore extends TokenStore {
   @override
-  Future<Token> read() => Future.value(null);
+  Future<Token?> read() => Future.value(null);
 
   @override
   Future<void> write(Token token) {

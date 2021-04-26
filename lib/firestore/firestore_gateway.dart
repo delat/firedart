@@ -64,7 +64,7 @@ class _FirestoreGatewayStreamCache {
     }
     onDone?.call(userInfo);
     // Clean up stream resources
-    _listenRequestSubject!.close();
+    _listenRequestSubject.close();
   }
 
   void _handleErrorStub(e) {

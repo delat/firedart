@@ -12,7 +12,7 @@ class TokenAuthenticator {
   }
 
   Future<void> authenticate(Map<String, String> metadata, String uri) async {
-    var idToken = await auth.tokenProvider!.idToken;
+    var idToken = await auth.tokenProvider.idToken;
     metadata['authorization'] = 'Bearer $idToken';
   }
 
