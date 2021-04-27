@@ -51,25 +51,25 @@ class UserGateway {
 
 class User {
   final String id;
-  final String displayName;
-  final String photoUrl;
-  final String email;
-  final bool emailVerified;
+  final String? displayName;
+  final String? photoUrl;
+  final String? email;
+  final bool? emailVerified;
 
   User._({
     required this.id,
-    required this.displayName,
-    required this.photoUrl,
-    required this.email,
-    required this.emailVerified,
+    this.displayName,
+    this.photoUrl,
+    this.email,
+    this.emailVerified,
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
     if (map['localId'] is! String ||
-        map['displayName'] is! String ||
-        map['photoUrl'] is! String ||
-        map['email'] is! String ||
-        map['emailVerified'] is! bool) {
+        (map['displayName'] != null && map['displayName'] is! String) ||
+        (map['photoUrl'] != null && map['photoUrl'] is! String) ||
+        (map['email'] != null && map['email'] is! String) ||
+        (map['emailVerified'] != null && map['emailVerified'] is! bool)) {
       throw Exception('Wrong user data format');
     }
 

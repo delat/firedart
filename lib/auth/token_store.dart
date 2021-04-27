@@ -86,13 +86,22 @@ class Token {
 
   Token(this._userId, this._idToken, this._refreshToken, this._expiry);
 
-  Token.fromMap(Map<String, dynamic> map)
-      : this(
-          map['userId'] ?? '',
-          map['idToken'] ?? '',
-          map['refreshToken'] ?? '',
-          DateTime.parse(map['expiry']),
-        );
+  factory Token.fromMap(Map<String, dynamic> map) {
+    if (map['userId'] is! String ||
+        map['idToken'] is! String ||
+        map['refreshToken'] is! String ||
+        map['expiry'] is! String ||
+        DateTime.tryParse(map['expiry']) == null) {
+      throw Exception('Wrong  token format!');
+    }
+
+    return Token(
+      map['userId'],
+      map['idToken'],
+      map['refreshToken'],
+      DateTime.parse(map['expiry']),
+    );
+  }
 
   Map<String, dynamic> toMap() => {
         'userId': _userId,
