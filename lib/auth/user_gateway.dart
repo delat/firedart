@@ -14,7 +14,7 @@ class UserGateway {
       _post('sendOobCode', {'requestType': 'VERIFY_EMAIL'});
 
   Future<User> getUser() async {
-    var map = await (_post('lookup', {}) as FutureOr<Map<String, dynamic>>);
+    var map = await _post('lookup', {});
     return User.fromMap(map['users'][0]);
   }
 
@@ -35,7 +35,7 @@ class UserGateway {
     await _post('delete', {});
   }
 
-  Future<Map<String, dynamic>?> _post<T>(
+  Future<Map<String, dynamic>> _post<T>(
       String method, Map<String, String> body) async {
     var requestUrl =
         'https://identitytoolkit.googleapis.com/v1/accounts:$method';
@@ -45,7 +45,7 @@ class UserGateway {
       body: body,
     );
 
-    return json.decode(response.body);
+    return jsonDecode(response.body);
   }
 }
 

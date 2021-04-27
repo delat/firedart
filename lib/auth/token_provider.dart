@@ -72,7 +72,7 @@ class TokenProvider {
 
     switch (response.statusCode) {
       case 200:
-        var map = json.decode(response.body);
+        var map = jsonDecode(response.body);
         await _tokenStore.setToken(
           map['localId'],
           map['id_token'],

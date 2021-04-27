@@ -12,4 +12,4 @@ protoc --dart_out=grpc:lib/generated -I%PROTOBUF%/src -I%GOOGLEAPIS% %GOOGLEAPIS
 protoc --dart_out=grpc:lib/generated -I%PROTOBUF%/src -I%GOOGLEAPIS% %GOOGLEAPIS%\google\firestore\v1\firestore.proto
 protoc --dart_out=grpc:lib/generated -I%PROTOBUF%/src -I%GOOGLEAPIS% %GOOGLEAPIS%\google\firestore\v1\document.proto
 protoc --dart_out=grpc:lib/generated -I%PROTOBUF%/src -I%GOOGLEAPIS% %GOOGLEAPIS%\google\type\latlng.proto
-dartfmt -w lib\generated
+dart format lib/generated

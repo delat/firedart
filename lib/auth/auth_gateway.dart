@@ -52,6 +52,6 @@ class AuthGateway {
       throw AuthException(response.body);
     }
 
-    return json.decode(response.body);
+    return jsonDecode(response.body);
   }
 }
