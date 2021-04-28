@@ -74,7 +74,7 @@ class TokenProvider {
       case 200:
         var map = jsonDecode(response.body);
         await _tokenStore.setToken(
-          map['localId'],
+          map['localId'] ?? _tokenStore.userId,
           map['id_token'],
           map['refresh_token'],
           int.parse(map['expires_in']),
