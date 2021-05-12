@@ -8,8 +8,43 @@ import 'package:firedart/storage/metadata.dart';
 import 'package:firedart/auth/firebase_auth.dart';
 import 'package:firedart/storage/storage_platform.dart';
 import 'package:http/http.dart';
-import 'package:mime/mime.dart';
-import 'package:path/path.dart' as p;
+
+class FirebaseStorageException implements Exception {
+  final String url;
+  final String message;
+  final String? resultContent;
+  const FirebaseStorageException(
+      {required this.url, required this.message, this.resultContent});
+
+  @override
+  String toString() {
+    return 'Firebase URL: $url $message';
+  }
+}
+
+class DownloadProgress {
+  double? get progress => size != null ? downloaded / size! : null;
+  final List<List<int>> chunks;
+  final int downloaded;
+  final int? size;
+  const DownloadProgress({
+    required this.chunks,
+    required this.downloaded,
+    required this.size,
+  });
+
+  Uint8List get data {
+    final recievedSize =
+        chunks.fold<int>(0, (value, element) => value + element.length);
+    final bytes = Uint8List(recievedSize);
+    var offset = 0;
+    for (final chunk in chunks) {
+      bytes.setRange(offset, offset + chunk.length, chunk);
+      offset += chunk.length;
+    }
+    return bytes;
+  }
+}
 
 class StorageBucketListItem {
   FirebaseStorage storage;
@@ -103,226 +138,128 @@ class FirebaseStorageReference {
     return await _internalRequest(_getListUrl());
   }
 
-  Future<void> putBytes(Uint8List data,
-      {void Function(int progress)? onProgress}) async {
-    var requestUrl = _getTargetUrl();
-    var res = Completer();
-    try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var request = Request('POST', Uri.parse(requestUrl));
-      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      request.headers[HttpHeaders.contentTypeHeader] =
-          'application/octet-stream';
-      request.bodyBytes = data;
-      var response = http.send(request);
-
-      var uploaded = 0;
-      response.asStream().listen((StreamedResponse r) {
-        if (r.statusCode != 200) {
-          throw Exception(
-              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
-        }
-        r.stream.listen(
-          (List<int> chunk) {
-            // Display percentage of completion
-            if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength!);
-            }
-            uploaded += chunk.length;
-          },
-          onDone: () => res.complete(),
-          onError: (error) => throw Exception([requestUrl, error]),
-        );
-      });
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
+  Stream<double> _putRequest(Request request) async* {
+    final response = await storage.auth.httpClient.send(request);
+    if (response.statusCode != 200) {
+      throw Exception('Server responded with error ${response.statusCode}: '
+          '${response.reasonPhrase}');
     }
 
-    return res.future;
+    var uploaded = 0.0;
+    yield uploaded;
+    await for (final chunk in response.stream) {
+      uploaded += chunk.length;
+      yield uploaded / response.contentLength!;
+    }
   }
 
-  Future<void> putFile(File file,
-      {void Function(int progress)? onProgress}) async {
-    var requestUrl = _getTargetUrl();
-    var res = Completer();
-    try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var data = await file.readAsBytes();
-      var request = Request('POST', Uri.parse(requestUrl));
-      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      request.headers[HttpHeaders.contentTypeHeader] =
-          lookupMimeType(p.basename(file.path)) ?? 'application/octet-stream';
-      request.bodyBytes = data;
-      var response = http.send(request);
+  Stream<double> putBytes(Uint8List data) async* {
+    final requestUrl = _getTargetUrl();
+    final token = await storage.auth.tokenProvider.idToken;
+    final request = Request('POST', Uri.parse(requestUrl));
+    request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+    request.headers[HttpHeaders.contentTypeHeader] = 'application/octet-stream';
+    request.bodyBytes = data;
 
-      var uploaded = 0;
-      response.asStream().listen((StreamedResponse r) {
-        if (r.statusCode != 200) {
-          throw Exception(
-              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
-        }
-        r.stream.listen(
-          (List<int> chunk) {
-            // Display percentage of completion
-            if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength!);
-            }
-            uploaded += chunk.length;
-          },
-          onDone: () => res.complete(),
-          onError: (error) => throw Exception([requestUrl, error]),
-        );
-      });
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
+    yield* _putRequest(request);
+  }
+
+  Stream<double> putFile(File file) async* {
+    yield* putBytes(await file.readAsBytes());
+  }
+
+  Stream<double> putString(String data) async* {
+    final requestUrl = _getTargetUrl();
+    final token = await storage.auth.tokenProvider.idToken;
+    final request = Request('POST', Uri.parse(requestUrl));
+    request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+    request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
+    request.body = data;
+
+    yield* _putRequest(request);
+  }
+
+  Stream<DownloadProgress> getBytes() async* {
+    final requestUrl = await getDownloadUrl();
+
+    try {
+      yield* _getBytes(requestUrl);
+    } on Exception catch (error) {
+      throw FirebaseStorageException(
+          url: requestUrl, message: error.toString());
+    }
+  }
+
+  Stream<DownloadProgress> _getBytes(String requestUrl) async* {
+    final http = storage.auth.httpClient;
+    final token = await storage.auth.tokenProvider.idToken;
+    final request = Request('GET', Uri.parse(requestUrl));
+    request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
+
+    final response = await http.send(request);
+    if (response.statusCode != 200) {
+      throw Exception('Server responded with error ${response.statusCode}: '
+          '${response.reasonPhrase}');
     }
 
-    return res.future;
-  }
+    final totalSize = response.contentLength;
+    final chunks = <List<int>>[];
+    var downloaded = 0;
 
-  Future<void> putString(String data,
-      {void Function(int progress)? onProgress}) async {
-    var requestUrl = _getTargetUrl();
-    var res = Completer();
-    try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var request = Request('POST', Uri.parse(requestUrl));
-      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      request.headers[HttpHeaders.contentTypeHeader] = 'text/plain';
-      request.body = data;
-      var response = http.send(request);
+    yield DownloadProgress(
+      size: totalSize,
+      downloaded: downloaded,
+      chunks: chunks,
+    );
 
-      var uploaded = 0;
-      response.asStream().listen((StreamedResponse r) {
-        if (r.statusCode != 200) {
-          throw Exception(
-              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
-        }
-        r.stream.listen(
-          (List<int> chunk) {
-            // Display percentage of completion
-            if (onProgress != null) {
-              onProgress((uploaded * 100) ~/ r.contentLength!);
-            }
-            uploaded += chunk.length;
-          },
-          onDone: () => res.complete(),
-          onError: (error) => throw Exception([requestUrl, error]),
-        );
-      });
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
+    await for (final chunk in response.stream) {
+      chunks.add(chunk);
+      downloaded += chunk.length;
+      yield DownloadProgress(
+        size: totalSize,
+        downloaded: downloaded,
+        chunks: chunks,
+      );
     }
 
-    return res.future;
+    final recievedSize =
+        chunks.fold<int>(0, (value, element) => value + element.length);
+
+    yield DownloadProgress(
+      size: recievedSize,
+      downloaded: downloaded,
+      chunks: chunks,
+    );
   }
 
-  Future<Uint8List> getBytes({void Function(int progress)? onProgress}) async {
-    var requestUrl = await getDownloadUrl();
-    var res = Completer<Uint8List>();
+  Stream<double> getFile(File file) async* {
+    final requestUrl = await getDownloadUrl();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var request = Request('GET', Uri.parse(requestUrl));
-      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      var response = http.send(request);
-
-      var chunks = <List<int>>[];
-      var downloaded = 0;
-
-      response.asStream().listen((StreamedResponse r) {
-        if (r.statusCode != 200) {
-          throw Exception(
-              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
+      DownloadProgress? state;
+      await for (final sstate in _getBytes(requestUrl)) {
+        state = sstate;
+        final progress = state.progress;
+        if (progress != null) {
+          yield progress;
         }
-        r.stream.listen(
-          (List<int> chunk) {
-            // Display percentage of completion
-            if (onProgress != null) {
-              onProgress((downloaded * 100) ~/ r.contentLength!);
-            }
-            chunks.add(chunk);
-            downloaded += chunk.length;
-          },
-          onDone: () async {
-            final bytes = Uint8List(r.contentLength!);
-            var offset = 0;
-            for (var chunk in chunks) {
-              bytes.setRange(offset, offset + chunk.length, chunk);
-              offset += chunk.length;
-            }
-            res.complete(bytes);
-          },
-          onError: (error) => throw Exception([requestUrl, error]),
-        );
-      });
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
-    }
-
-    return res.future;
-  }
-
-  Future<void> writeToFile(File file,
-      {void Function(int progress)? onProgress}) async {
-    var requestUrl = await getDownloadUrl();
-    var res = Completer();
-    try {
-      if (file.existsSync() == false) {
-        await file.create();
       }
-
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var request = Request('GET', Uri.parse(requestUrl));
-      request.headers[HttpHeaders.authorizationHeader] = 'Firebase $token';
-      var response = http.send(request);
-
-      var chunks = <List<int>>[];
-      var downloaded = 0;
-
-      response.asStream().listen((StreamedResponse r) {
-        if (r.statusCode != 200) {
-          throw Exception(
-              'Server responded with error ${r.statusCode}: ${r.reasonPhrase}');
-        }
-        r.stream.listen(
-          (List<int> chunk) {
-            // Display percentage of completion
-            if (onProgress != null) {
-              onProgress((downloaded * 100) ~/ r.contentLength!);
-            }
-            chunks.add(chunk);
-            downloaded += chunk.length;
-          },
-          onDone: () async {
-            final bytes = Uint8List(r.contentLength!);
-            var offset = 0;
-            for (var chunk in chunks) {
-              bytes.setRange(offset, offset + chunk.length, chunk);
-              offset += chunk.length;
-            }
-            await file.writeAsBytes(bytes);
-            res.complete();
-          },
-          onError: (error) => throw Exception([requestUrl, error]),
-        );
-      });
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
+      if (state == null) {
+        throw Exception('No data recieved');
+      }
+      await file.writeAsBytes(state.data);
+      yield 1;
+    } on Exception catch (error) {
+      throw FirebaseStorageException(
+          url: requestUrl, message: error.toString());
     }
-
-    return res.future;
   }
 
   Future<String> getDownloadUrl() async {
-    var data = await (_performFetch() as FutureOr<Map<String, dynamic>>);
+    var data = await _performFetch();
     if (data['downloadTokens'] == null) {
       throw Exception(
-          'Could not extract "downloadTokens" property from response. Response: $data');
+          'Could not extract "downloadTokens" property from response. '
+          'Response: $data');
     }
 
     return _getFullDownloadUrl() + data['downloadTokens'];
@@ -334,12 +271,12 @@ class FirebaseStorageReference {
   }
 
   Future<void> delete() async {
-    var requestUrl = _getDownloadUrl();
+    final requestUrl = _getDownloadUrl();
     var resultContent = 'N/A';
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var result = await http.delete(Uri.parse(requestUrl),
+      final http = storage.auth.httpClient;
+      final token = await storage.auth.tokenProvider.idToken;
+      final result = await http.delete(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
       resultContent = result.body;
 
@@ -347,8 +284,11 @@ class FirebaseStorageReference {
         throw Exception(
             'Server responded with error ${result.statusCode}: ${result.body}');
       }
-    } catch (ex) {
-      throw Exception([requestUrl, resultContent, ex]);
+    } on Exception catch (error) {
+      throw FirebaseStorageException(
+          url: requestUrl,
+          message: error.toString(),
+          resultContent: resultContent);
     }
   }
 
@@ -393,37 +333,38 @@ class FirebaseStorageReference {
   }
 
   Future<Map<String, dynamic>> _performFetch() async {
-    var requestUrl = _getDownloadUrl();
+    final requestUrl = _getDownloadUrl();
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var result = await http.read(Uri.parse(requestUrl),
+      final http = storage.auth.httpClient;
+      final token = await storage.auth.tokenProvider.idToken;
+      final result = await http.read(Uri.parse(requestUrl),
           headers: {'Authorization': 'Firebase $token'});
 
       return jsonDecode(result);
-    } catch (ex) {
-      throw Exception([requestUrl, ex]);
+    } on Exception catch (error) {
+      throw FirebaseStorageException(
+          url: requestUrl, message: error.toString());
     }
   }
 
   Future<StorageBucketList> _internalRequest(String fullUrl) async {
     try {
-      var http = storage.auth.httpClient;
-      var token = await storage.auth.tokenProvider.idToken;
-      var result = await http.get(Uri.parse(fullUrl),
+      final http = storage.auth.httpClient;
+      final token = await storage.auth.tokenProvider.idToken;
+      final result = await http.get(Uri.parse(fullUrl),
           headers: {'Authorization': 'Firebase $token'});
 
       if (result.statusCode != 200) {
         throw Exception(
             'Server responded with error ${result.statusCode}: ${result.body}');
       }
-      var bucket = StorageBucketList.fromMap(
+      final bucket = StorageBucketList.fromMap(
         storage: storage,
         map: jsonDecode(result.body),
       );
       return bucket;
-    } catch (ex) {
-      throw Exception([fullUrl, ex]);
+    } on Exception catch (error) {
+      throw FirebaseStorageException(url: fullUrl, message: error.toString());
     }
   }
 }
